@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<div th:fragment="spisokfrag">
+    <table>
+        <tr>
+            <th align="center">№ п/п</th>
+            <th align="center">Данные</th>
+            <th align="center">Удалить</th>
+        </tr>
+        <tr th:each="v : ${spisok}">
+            <td  th:text="${v.getId()}">
+            </td>
+            <td  th:text="${v.getVal()}">
+            </td>
+            <td>
+                <a name="del" th:id="${v.getId()}" th:value="${type}"
+                   class="red waves-effect waves-light btn">X</a>
+            </td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>

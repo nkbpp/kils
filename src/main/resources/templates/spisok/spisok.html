@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+        <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>KILS</title>
+    <link type="text/css" rel="stylesheet" href="/webjars/materialize/1.0.0-rc.2/dist/css/materialize.min.css"/>
+    <script type="text/javascript" src="/webjars/jquery/3.3.1/jquery.js"></script>
+
+    <script type="text/javascript">
+    </script>
+
+    <style>
+    </style>
+
+    <!--<link rel="stylesheet" th:href="@{/styles/full.css}">&lt;!&ndash;мои локальные стили&ndash;&gt;-->
+
+</head>
+<body>
+
+<div th:insert="fragment/logout :: logout(${user})"></div>
+<br>
+<div th:insert="menu/menu :: menu"></div>
+
+<br>
+
+<div class="row">
+    <div class="col s6 row">
+        <div class="col s6">Значение</div>
+        <div class="col s3">
+            <input type="text" id="addznach">
+        </div>
+        <div class="col s3">
+            <a class="waves-effect waves-light btn" id="add" th:value="${type}">Добавить</a>
+        </div>
+    </div>
+</div>
+
+<div id="tablekonv" th:insert="spisok/frag/spisokfrag :: spisokfrag"></div>
+
+<script type="text/javascript" th:src="@{/js/spisok.js}"></script>
+<script type="text/javascript" src="/webjars/materialize/1.0.0-rc.2/dist/js/materialize.min.js"></script>
+</body>
+</html>

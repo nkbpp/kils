@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<body>
+
+<table th:fragment="sved_zar_god_popup_add(id)">
+    <tr>
+        <td> Год</td>
+        <td>
+            <input type="text" id="swedzargodGodAdd">
+        </td>
+    </tr>
+    <tr>
+        <td> январь</td>
+        <td>
+            <input type="text" id="swedzargodJanuaryAdd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> февраль</td>
+        <td>
+            <input type="text" id="swedzargodFebruaryAdd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> март</td>
+        <td>
+            <input type="text" id="swedzargodMarchAdd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> апрель</td>
+        <td>
+            <input type="text" id="swedzargodAprilAdd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> май</td>
+        <td>
+            <input type="text" id="swedzargodMayAdd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> июнь</td>
+        <td>
+            <input type="text" id="swedzargodJuneAdd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> июль</td>
+        <td>
+            <input type="text" id="swedzargodJulyAdd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> август</td>
+        <td>
+            <input type="text" id="swedzargodAugustAdd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> сентябрь</td>
+        <td>
+            <input type="text" id="swedzargodSeptemberAdd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> октябрь</td>
+        <td>
+            <input type="text" id="swedzargodOctoberAdd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> ноябрь</td>
+        <td>
+            <input type="text" id="swedzargodNovemberAdd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> декабрь</td>
+        <td>
+            <input type="text" id="swedzargodDecemberAdd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td class="afValue afCenter">
+            <input type="button" value="Добавить"
+                   th:name="${id}"
+                   th:id="sved_zar_god_add">
+    </tr>
+</table>
+
+<table th:fragment="sved_zar_god_popup_update(svedZar_god)">
+    <tr>
+        <td> Год</td>
+        <td>
+            <input type="text" id="swedzargodGodUpd"
+                   th:value="${svedZar_god.getGod()}">
+        </td>
+    </tr>
+    <tr >
+        <td> январь</td>
+        <td th:if="${svedZar_god.isEmptySvedZarMounthByMounth('1')}">
+            <input type="text" id="swedzargodJanuaryUpd"
+                   th:value="${svedZar_god.getSvedZarMounthByMounth('1').getSum()}" name="quantity">
+        </td>
+        <td th:unless="${svedZar_god.isEmptySvedZarMounthByMounth('1')}" >
+            <input type="text" id="swedzargodJanuaryUpd" name="quantity">
+        </td>
+    </tr>
+    <tr >
+        <td> февраль</td>
+        <td th:if="${svedZar_god.isEmptySvedZarMounthByMounth('2')}">
+            <input type="text" id="swedzargodFebruaryUpd"
+                   th:value="${svedZar_god.getSvedZarMounthByMounth('2').getSum()}" name="quantity">
+        </td>
+        <td th:unless="${svedZar_god.isEmptySvedZarMounthByMounth('2')}">
+            <input type="text" id="swedzargodFebruaryUpd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> март</td>
+        <td th:if="${svedZar_god.isEmptySvedZarMounthByMounth('3')}">
+            <input type="text" id="swedzargodMarchUpd"
+                   th:value="${svedZar_god.getSvedZarMounthByMounth('3').getSum()}" name="quantity">
+        </td>
+        <td th:unless="${svedZar_god.isEmptySvedZarMounthByMounth('3')}">
+            <input type="text" id="swedzargodMarchUpd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> апрель</td>
+        <td th:if="${svedZar_god.isEmptySvedZarMounthByMounth('4')}">
+            <input type="text" id="swedzargodAprilUpd"
+                   th:value="${svedZar_god.getSvedZarMounthByMounth('4').getSum()}" name="quantity">
+        </td>
+        <td th:unless="${svedZar_god.isEmptySvedZarMounthByMounth('4')}">
+            <input type="text" id="swedzargodAprilUpd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> май</td>
+        <td th:if="${svedZar_god.isEmptySvedZarMounthByMounth('5')}">
+            <input type="text" id="swedzargodMayUpd"
+                   th:value="${svedZar_god.getSvedZarMounthByMounth('5').getSum()}" name="quantity">
+        </td>
+        <td th:unless="${svedZar_god.isEmptySvedZarMounthByMounth('5')}">
+            <input type="text" id="swedzargodMayUpd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> июнь</td>
+        <td th:if="${svedZar_god.isEmptySvedZarMounthByMounth('6')}">
+            <input type="text" id="swedzargodJuneUpd"
+                   th:value="${svedZar_god.getSvedZarMounthByMounth('6').getSum()}" name="quantity">
+        </td>
+        <td th:unless="${svedZar_god.isEmptySvedZarMounthByMounth('6')}">
+            <input type="text" id="swedzargodJuneUpd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> июль</td>
+        <td th:if="${svedZar_god.isEmptySvedZarMounthByMounth('7')}">
+            <input type="text" id="swedzargodJulyUpd"
+                   th:value="${svedZar_god.getSvedZarMounthByMounth('7').getSum()}" name="quantity">
+        </td>
+        <td th:unless="${svedZar_god.isEmptySvedZarMounthByMounth('7')}">
+            <input type="text" id="swedzargodJulyUpd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> август</td>
+        <td th:if="${svedZar_god.isEmptySvedZarMounthByMounth('8')}">
+            <input type="text" id="swedzargodAugustUpd"
+                   th:value="${svedZar_god.getSvedZarMounthByMounth('8').getSum()}" name="quantity">
+        </td>
+        <td th:unless="${svedZar_god.isEmptySvedZarMounthByMounth('8')}">
+            <input type="text" id="swedzargodAugustUpd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> сентябрь</td>
+        <td th:if="${svedZar_god.isEmptySvedZarMounthByMounth('9')}">
+            <input type="text" id="swedzargodSeptemberUpd"
+                   th:value="${svedZar_god.getSvedZarMounthByMounth('9').getSum()}" name="quantity">
+        </td>
+        <td th:unless="${svedZar_god.isEmptySvedZarMounthByMounth('9')}">
+            <input type="text" id="swedzargodSeptemberUpd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> октябрь</td>
+        <td th:if="${svedZar_god.isEmptySvedZarMounthByMounth('10')}">
+            <input type="text" id="swedzargodOctoberUpd"
+                   th:value="${svedZar_god.getSvedZarMounthByMounth('10').getSum()}" name="quantity">
+        </td>
+        <td th:unless="${svedZar_god.isEmptySvedZarMounthByMounth('10')}">
+            <input type="text" id="swedzargodOctoberUpd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> ноябрь</td>
+        <td th:if="${svedZar_god.isEmptySvedZarMounthByMounth('11')}">
+            <input type="text" id="swedzargodNovemberUpd"
+                   th:value="${svedZar_god.getSvedZarMounthByMounth('11').getSum()}" name="quantity">
+        </td>
+        <td th:unless="${svedZar_god.isEmptySvedZarMounthByMounth('11')}">
+            <input type="text" id="swedzargodNovemberUpd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td> декабрь</td>
+        <td th:if="${svedZar_god.isEmptySvedZarMounthByMounth('12')}">
+            <input type="text" id="swedzargodDecemberUpd"
+                   th:value="${svedZar_god.getSvedZarMounthByMounth('12').getSum()}" name="quantity">
+        </td>
+        <td th:unless="${svedZar_god.isEmptySvedZarMounthByMounth('12')}" >
+            <input type="text" id="swedzargodDecemberUpd" name="quantity">
+        </td>
+    </tr>
+    <tr>
+        <td class="afValue afCenter">
+            <input type="button" value="Изменить"
+                   th:name="${svedZar_god.getId_svedzargod()}"
+                   th:id="sved_zar_god_update">
+    </tr>
+</table>
+
+</body>
+</html>

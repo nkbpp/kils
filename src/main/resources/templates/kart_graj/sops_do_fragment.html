@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<body>
+
+<div id="sops_do_place" th:fragment="sops_do(sops_do)">
+    <div th:each="s : ${sops_do}">
+        <div class="afNoFloat afNoBreakInside">
+            <div class="afRow">
+                <div class="afC">Наименование организации</div>
+                <div class="afCol-2-3 afValue">
+                    <input class="name"
+                           th:name="sopsdogetName_org + ${s.getId_sops_do()}" type="text"
+                           th:value="${s.getName_org()}">
+                </div>
+            </div>
+            <div class="afRow">
+                <!--<div class="afC">Вид деятельности (код)</div>-->
+                <div class="afCol-2-3 afValue">
+
+                    <div th:replace="popup/spiski :: spiski(${spisokDejatels},
+                            ${'sopsdogetVid_dSelect' + s.getId_sops_do()},
+                            'Вид деятельности (код)')"></div>
+
+                    <input type="text" th:name="sopsdogetVid_d + ${s.getId_sops_do()}"
+                           th:value="${s.getVid_d()}" class="sopsdogetVid_dHide hide">
+
+                    <input type="button" value="&#10004;" placeholder="Изменить"
+                           th:name="${s.getId_sops_do()}"
+                           th:id="sopsdoupdatename">
+                    <input type="button" value="&#10060;" placeholder="Удалить"
+                           th:name="${s.getId_sops_do()}"
+                           th:id="sopsdodelette">
+                    <input type="button" value="Добавить период" placeholder="Добавить период"
+                           th:name="${s.getId_sops_do()}"
+                           th:id="sopsdoljnostadd_popup">
+                </div>
+            </div>
+
+            <p class="afInterval"></p>
+
+            <div th:replace="kart_graj/sops_do_fragment :: sops_do_doljnost(${s.getSops_do_doljnosts()},${s.getSvedZar_dos()},${s.getId_sops_do()})"></div>
+
+        </div>
+    </div>
+</div>
+
+<div th:fragment="sops_do_doljnost(doljnost, sved_zar, sops_do_id)">
+    <div th:each="d : ${doljnost}">
+        <table class="afTable afNoBreakInside">
+            <tr>
+                <th rowspan="2" class="afCenter">Начало периода (дд.мм.гггг)</th>
+                <th rowspan="2" class="afCenter">Конец периода (дд.мм.гггг)</th>
+                <th rowspan="2" class="afCenter">Территориальные условия (код)</th>
+                <th rowspan="2" class="afCenter">Особые условия труда (код)</th>
+                <th colspan="2" class="afCenter">Исчисляемый трудовой стаж</th>
+                <th colspan="2" class="afCenter">Выслуга лет</th>
+                <td class="afCenter" rowspan="2">Кор. р</td>
+            </tr>
+            <tr>
+                <th class="afCenter">основание (код)</th>
+                <th class="afCenter">Дополнительные сведения</th>
+                <th class="afCenter">основание (код)</th>
+                <th class="afCenter">дополнительные сведения</th>
+            </tr>
+            <tr th:each="st : ${d.getSops_tables()}">
+                <td class="afValue afCenter" th:text=${st.getPeriod_startD()}></td>
+                <td class="afValue afCenter" th:text=${st.getPeriod_endD()}></td>
+                <td class="afValue afCenter" th:text="${st.getTer_uslovija_koef()} == null ? ${st.getTer_uslovija()} : ${st.getTer_uslovija()} + '  ' + ${st.getTer_uslovija_koef()}"></td>
+                <td class="afValue afCenter" th:text="${st.getPoz_spis()} == null ? ${st.getOsob_uslovija()} : ${st.getOsob_uslovija()} + '  ' + ${st.getPoz_spis()}"></td>
+                <td class="afValue afCenter" th:text=${st.getTrud_staj_osn()}></td>
+                <td class="afValue afCenter" th:text=${st.getTrud_staj_dopsved()}></td>
+                <td class="afValue afCenter" th:text=${st.getVis_let_osn()}></td>
+                <td class="afValue afCenter" th:text=${st.getVis_let_dopsved()}></td>
+                <td class="afValue afCenter">
+                    <label>
+                        <input type="checkbox" class="filled-in sopstablekorresh"
+                               th:name="${st.getId_sops_do_table()}" th:id="sopstablekorresh"
+                               th:checked="${st.getIsreshkor()==1}" />
+                        <span class="marginonospan"></span>
+                    </label>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="10">
+                    <div style="display:flex">
+                        <DIV th:text="${d.getDoljnost()}"></DIV>
+
+                        <input type="button" value="&#9998;" placeholder="Редактировать"
+                               th:name="${d.getId_sops_do_doljnost()}"
+                               th:id="sopsdoljnostupdatemodalopen">
+                        <input type="button" value="&#10060;" placeholder="Удалить"
+                               th:name="${d.getId_sops_do_doljnost()}"
+                               th:id="sopsdoljnostdelette">
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+    <p class="afInterval"></p>
+    <p class="afP">Сведения о заработке (вознаграждении), доходе, учитываемые при назначении страховой пенсии: <input
+            type="button" value="+" placeholder="Добавить"
+            th:name="${sops_do_id}" id="sved_zar_do_popup"></p>
+
+
+    <div th:replace="kart_graj/sops_do_fragment :: sved_zar_do(${sved_zar})"></div>
+
+</div>
+
+<div th:fragment="sops_do_table(sops_tables, doljnost, sved_zar, sops_do_id)">
+    <table class="afTable afNoBreakInside">
+        <tr>
+            <th rowspan="2" class="afCenter">Начало периода (дд.мм.гггг)</th>
+            <th rowspan="2" class="afCenter">Конец периода (дд.мм.гггг)</th>
+            <th rowspan="2" class="afCenter">Территориальные условия (код)</th>
+            <th rowspan="2" class="afCenter">Особые условия труда (код)</th>
+            <th colspan="2" class="afCenter">Исчисляемый трудовой стаж</th>
+            <th colspan="2" class="afCenter">Выслуга лет</th>
+            <th rowspan="2" class="afCenter">Действие</th>
+        </tr>
+        <tr>
+            <th class="afCenter">основание (код)</th>
+            <th class="afCenter">Дополнительные сведения</th>
+            <th class="afCenter">основание (код)</th>
+            <th class="afCenter">дополнительные сведения</th>
+        </tr>
+        <tr th:each="st : ${sops_tables}">
+            <td class="afValue afCenter" th:text=${st.getPeriod_start()}></td>
+            <td class="afValue afCenter" th:text=${st.getPeriod_end()}></td>
+            <td class="afValue afCenter" th:text=${st.getTer_uslovija()}></td>
+            <!--<td class="afValue afCenter" th:text=${s.getTer_uslovija_koef()}></td>-->
+            <td class="afValue afCenter" th:text=${st.getOsob_uslovija()}></td>
+            <td class="afValue afCenter" th:text=${st.getTrud_staj_osn()}></td>
+            <td class="afValue afCenter" th:text=${st.getTrud_staj_dopsved()}></td>
+            <td class="afValue afCenter" th:text=${st.getVis_let_osn()}></td>
+            <td class="afValue afCenter" th:text=${st.getVis_let_dopsved()}></td>
+            <td class="afValue afCenter">
+                <div style="display:flex">
+                    <input type="button" value="&#9998;" placeholder="Редактировать"
+                           th:name="${st.getId_sops_do_table()}"
+                           th:id="sopstableupdatemodalopen">
+                    <input type="button" value="&#10060;" placeholder="Удалить"
+                           th:name="${st.getId_sops_do_table()}"
+                           th:id="sopstabledelette">
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="9">
+                <input type="button" value="+" placeholder="Добавить"
+                       th:name="${sops_do_id}"
+                       th:id="sopstabledoaddmodalopen">
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="9">
+                <input th:name="sopsdogetDoljnost + ${s.getId_sops_do()}" type="text" th:value="${s.getDoljnost()}">
+                <input type="button" value="&#10004;" placeholder="Изменить"
+                       th:name="${s.getId_sops_do()}"
+                       th:id="sopsdoupdateDoljnost">
+            </td>
+        </tr>
+    </table>
+
+    <p class="afInterval"></p>
+    <p class="afP">Сведения о заработке (вознаграждении), доходе, учитываемые при назначении страховой пенсии: <input
+            type="button" value="+" placeholder="Добавить"
+            th:name="${sops_do_id}" id="sved_zar_do_popup"></p>
+
+
+    <div th:replace="kart_graj/sops_do_fragment :: sved_zar_do(${sved_zar})"></div>
+
+</div>
+
+<div th:fragment="sved_zar_do(sved_zar)" th:each="sz : ${sved_zar}">
+
+    <p class="afInterval"></p>
+    <div class="afRow">
+        <div class="afC">Номер справки:</div>
+        <div class="afCol-1-6">
+            <input type="text" th:value=${sz.getNom_sprav()} th:id="'SvedZarDoNom_sprav' + ${sz.getId_svedzar()}">
+        </div>
+        <div class="afC">Дата справки:</div>
+        <div class="afCol-1-6">
+            <input type="date" th:value=${sz.getData_sprav()} th:id="'SvedZarDoData_sprav' + ${sz.getId_svedzar()}">
+        </div>
+    </div>
+    <p class="afP">Заработок за период с
+        <input type="date" th:value=${sz.getPeriod_s()} th:id="'SvedZarDoPeriod_s' + ${sz.getId_svedzar()}">
+        <!--<span class="afValue afUnderline" th:text=${sz.getPeriod_s()}></span>--> по
+        <input type="date" th:value=${sz.getPeriod_po()} th:id="'SvedZarDoPeriod_po' + ${sz.getId_svedzar()}">
+        <!--<span class="afValue afUnderline" th:text=${sz.getPeriod_po()}></span>-->
+        <input type="button" value="&#10004;" placeholder="Изменить"
+               th:name="${sz.getId_svedzar()}" id="updateSvedZarDo">
+        <input type="button" value="&#10060;" placeholder="Удалить"
+               th:name="${sz.getId_svedzar()}" id="deleteSvedZarDo">
+    </p>
+    <table>
+        <tr>
+            <td class="afVerticalTop" th:each="szg : ${sz.getZarGods()}">
+                <table class="afColumn">
+                    <tr>
+                        <td>Год <span class="afValue" th:text=${szg.getGod()}></span></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Сумма (руб.)</td>
+                        <td></td>
+                    </tr>
+
+                    <tr th:each="szm : ${szg.getSvedZarMounths()}">
+                        <td th:text=${szm.getMounthName()}></td>
+                        <td class="afTextAlignRight" th:text=${szm.getSum()}></td>
+                    </tr>
+
+                    <tr>
+                        <td>Итого</td>
+                        <td th:text=${szg.getItogo()}></td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                        </td>
+                        <td >
+                            <div style="display:flex">
+                                <input type="button" value="&#9998;" placeholder="Редактировать"
+                                       th:name="${szg.getId_svedzargod()}" id="updateSvedZarGod_popup">
+                                <input type="button" value="&#10060;" placeholder="Удалить"
+                                       th:name="${szg.getId_svedzargod()}" id="deletteSvedGod">
+                                Корр. р.
+                                <label>
+                                    <input type="checkbox" class="filled-in svedzargodkorresh"
+                                           th:name="${szg.getId_svedzargod()}" th:id="svedzargodkorresh"
+                                           th:checked="${szg.getIsreshkor()==1}" />
+                                    <span class="marginonospan"></span>
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+            <td>
+                <input type="button" value="Добавить год" th:name="${sz.getId_svedzar()}" id="addSvedZarGod_popup">
+                <input type="button" value="Загрузить из файла" th:name="${sz.getId_svedzar()}" id="addSvedZarGodFromFilemodalopen">
+            </td>
+        </tr>
+    </table>
+    <hr>
+
+</div>
+
+
+</body>
+</html>

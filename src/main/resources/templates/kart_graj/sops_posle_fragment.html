@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<body>
+
+<div id="sops_posle_place" th:fragment="sops_posle(sops_posle)">
+    <div th:each="s : ${sops_posle}">
+
+        <div class="afNoFloat">
+            <div class="afRow">Страхователь:
+                <input class="name"
+                       th:name="sopsposlegetStrahovatel + ${s.getId_sops_posle()}" type="text"
+                       th:value="${s.getStrahovatel()}">
+            </div>
+            <div class="afRow">Наименование
+                <input class="name"
+                       th:name="sopsposlegetName_org + ${s.getId_sops_posle()}" type="text"
+                       th:value="${s.getName_org()}">
+            </div>
+            <div class="afRow">Регистрационный номер ПФР
+                <input
+                        th:name="sopsposlegetReg_num_pfr + ${s.getId_sops_posle()}" type="text"
+                        th:value="${s.getReg_num_pfr()}" class="mask-regnum">
+                <input type="button" value="&#10004;" placeholder="Изменить"
+                       th:name="${s.getId_sops_posle()}"
+                       th:id="sopsposleupdatename">
+                <input type="button" value="&#10060;" placeholder="Удалить"
+                       th:name="${s.getId_sops_posle()}"
+                       th:id="sopsposledelette">
+
+                <a th:id="x2+${s.getId_sops_posle()}"
+                   th:href="'/kils/find_kart_graj/downloadxml2?idpeople='+${people.getId_people()}+'&idsp='+${s.getId_sops_posle()}"
+                   hidden>xml2</a>
+                <input type="button" th:name="${s.getId_sops_posle()}"
+                   th:class="${s.isSopsPosleKorZ()? 'download' : 'download hide'}" value="Скачать xml">
+
+            </div>
+            <div class="afRow">Сведения о стаже работы</div>
+
+            <div th:replace="kart_graj/sops_posle_fragment :: sops_posle_table(${s.getSops_tables()},${s.getSvedZar_posles()},${s.getId_sops_posle()})"></div>
+
+        </div>
+    </div>
+</div>
+
+<div th:fragment="sops_posle_table(sops_tables, sved_zar, sops_posle_id)">
+    <table class="afTable afNoBreakInside">
+        <tr>
+            <td rowspan="2" class="afCenter">Начало периода (дд.мм.гггг)</td>
+            <td rowspan="2" class="afCenter">Конец периода (дд.мм.гггг)</td>
+            <td rowspan="2" class="afCenter">Территориальные условия (код)</td>
+            <td rowspan="2" class="afCenter">Особые условия труда (код)</td>
+            <td colspan="2" class="afCenter">Исчисляемый трудовой стаж</td>
+            <td colspan="2" class="afCenter">Выслуга лет</td>
+            <td rowspan="2" class="afCenter">Действие</td>
+            <td colspan="2" class="afCenter">Корр.</td>
+        </tr>
+        <tr>
+            <td class="afCenter">основание (код)</td>
+            <td class="afCenter">Дополнительные сведения</td>
+            <td class="afCenter">основание (код)</td>
+            <td class="afCenter">дополнительные сведения</td>
+            <td class="afCenter">Р</td>
+            <td class="afCenter">З</td>
+        </tr>
+        <tr th:each="st : ${sops_tables}">
+            <td class="afValue afCenter" th:text=${st.getPeriod_startD()}></td>
+            <td class="afValue afCenter" th:text=${st.getPeriod_endD()}></td>
+            <td class="afValue afCenter" th:text="${st.getTer_uslovija_koef()} == null ? ${st.getTer_uslovija()} : ${st.getTer_uslovija()} + ',' + ${st.getTer_uslovija_koef()}"></td>
+            <td class="afValue afCenter" th:text="${st.getPoz_spis()} == null ? ${st.getOsob_uslovija()} : ${st.getOsob_uslovija()} + ',' + ${st.getPoz_spis()}"></td>
+            <td class="afValue afCenter" th:text=${st.getTrud_staj_osn()}></td>
+            <td class="afValue afCenter" th:text=${st.getTrud_staj_dopsved()}></td>
+            <td class="afValue afCenter" th:text=${st.getVis_let_osn()}></td>
+            <td class="afValue afCenter" th:text=${st.getVis_let_dopsved()}></td>
+            <td class="afValue afCenter">
+                <div style="display:flex">
+                    <input type="button" value="&#9998;" placeholder="Редактировать"
+                           th:name="${st.getId_sops_do_table()}"
+                           th:id="sopstableupdatemodalopen">
+                    <input type="button" value="&#10060;" placeholder="Удалить"
+                           th:name="${st.getId_sops_do_table()}"
+                           th:id="sopstabledelette">
+                </div>
+            </td>
+            <td class="afValue afCenter">
+                <label>
+                    <input type="checkbox" class="filled-in sopstablekorresh"
+                           th:name="${st.getId_sops_do_table()}" th:id="sopstablekorresh"
+                           th:checked="${st.getIsreshkor()==1}" />
+                    <span class="marginonospan"></span>
+                </label>
+            </td>
+            <td class="afValue afCenter">
+                <label>
+                    <input type="checkbox" class="filled-in sopstablekorrzap"
+                           th:name="${st.getId_sops_do_table()}" th:id="sopstablekorrzap"
+                           th:checked="${st.getIszapkor()==1}" />
+                    <span class="marginonospan"></span>
+                </label>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="11">
+                <input type="button" value="+" placeholder="Добавить"
+                       th:name="${sops_posle_id}"
+                       th:id="sopstableposleaddmodalopen">
+            </td>
+        </tr>
+
+    </table>
+
+    <div th:replace="kart_graj/sops_posle_fragment :: sved_zar_posle(${sved_zar},${sops_posle_id})"></div>
+
+</div>
+
+<div th:fragment="sved_zar_posle(sved_zar,sops_posle_id)">
+
+    <p class="afInterval"></p>
+    <p class="afP">Сведения о заработке (вознаграждении), доходе, учитываемые при назначении страховой пенсии:</p>
+    <p class="afInterval"></p>
+
+    <table>
+        <tr>
+            <td class="afVerticalTop" th:each="sz : ${sved_zar}">
+                <table class="afColumn">
+                    <tr>
+                        <td colspan="2">Код категории <br> застрахованного лица</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="afUnderlinedBlock" th:text=${sz.getKod()}></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Отчетный период</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="afUnderlinedBlock" th:text=${sz.getGod()}></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Сумма (руб.)</td>
+                    </tr>
+
+                    <tr th:each="szm : ${sz.getSvedZarMounths()}">
+                        <td th:text=${szm.getMounthName()}></td>
+                        <td class="afTextAlignRight" th:text=${szm.getSum()}>
+                            <input type="text" th:value=${szm.getSum()}>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Итого</td>
+                        <td th:text=${sz.getItogo()}></td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2">
+                            <div style="display:flex">
+                                <input type="button" value="&#9998;" placeholder="Редактировать"
+                                       th:name="${sz.getId_svedzar()}" id="updateSvedZarPosle_popup">
+                                <input type="button" value="&#10060;" placeholder="Удалить"
+                                       th:name="${sz.getId_svedzar()}" id="deletteSvedZarPosle">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <div style="display:flex">
+                                Корр.р.
+                                <label>
+                                    <input type="checkbox" class="filled-in svedzarposlekorresh"
+                                           th:name="${sz.getId_svedzar()}" th:id="svedzarposlekorresh"
+                                           th:checked="${sz.getIsreshkor()==1}" />
+                                    <span class="marginonospan"></span>
+                                </label>
+                                Корр.з.
+                                <label>
+                                    <input type="checkbox" class="filled-in svedzarposlekorrzap"
+                                           th:name="${sz.getId_svedzar()}" th:id="svedzarposlekorrzap"
+                                           th:checked="${sz.getIszapkor()==1}" />
+                                    <span class="marginonospan"></span>
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </td>
+
+            <td>
+                <input type="button" value="Добавить год"
+                       th:name="${sops_posle_id}" id="addSvedZarPosle_popup">
+            </td>
+
+        </tr>
+    </table>
+
+</div>
+
+
+</body>
+</html>

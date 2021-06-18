@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+
+        <div th:fragment="menu">
+
+            <ul id="dropdown3" class="dropdown-content">
+                <li><a th:href="@{/kils/spisok/ter_usl}">Территориальные условия на 31.12.2001</a></li>
+                <li class="divider"></li>
+                <li><a th:href="@{/kils/spisok/rai_koef}">Районный коэффициент</a></li>
+                <li class="divider"></li>
+                <li><a th:href="@{/kils/spisok/osob_usl_tr}">Особые условия труда</a></li>
+                <li class="divider"></li>
+                <li><a th:href="@{/kils/spisok/ischis_staj}">ИСЧИСЛЕНИЕ СТАЖА</a></li>
+                <li class="divider"></li>
+                <li><a th:href="@{/kils/spisok/vis_let}">ВЫСЛУГА ЛЕТ</a></li>
+                <li class="divider"></li>
+                <li><a th:href="@{/kils/spisok/dejatel}">ДЕЯТЕЛЬНОСТЬ</a></li>
+                <li class="divider"></li>
+                <li><a th:href="@{/kils/spisok/decret_deti}">ДЕКРЕТ-ДЕТИ</a></li>
+                <li class="divider"></li>
+            </ul>
+
+            <nav>
+                <div class="nav-wrapper">
+                    <a href="/kils/upfr_menu" id="menu-back" class="right">Главная</a>
+                    <ul id="nav-mobile" class="left hide-on-med-and-down">
+                        <li><a href="/kils/find_kart_graj">Карточки гражданина</a></li>
+                        <li th:if="${roleList.indexOf('ROLE_DOWNLOAD')!=-1}"><a href="/kils/find_kart_graj_another_ray">Карточки из других районов</a></li>
+                        <li><a href="/kils/download_xml">Добавить карточку нового гражданина</a></li>
+                        <li><a class="dropdown-trigger" href="#!" data-target="dropdown3">Справочная информация</a></li>
+                        <li><a href="/kils/download_xlsx">Организации</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!--<a a href="/kils/download_xml">Добавить карточку нового гражданина</a>
+            <br>
+            <a a href="/kils/find_kart_graj">Найти карточку существующего гражданина</a>-->
+            <script>
+                $(document).ready(function () {
+                    $(".dropdown-trigger").dropdown(); //чтобы меню хренячило
+                });
+            </script>
+        </div>
+
+    </body>
+</html>

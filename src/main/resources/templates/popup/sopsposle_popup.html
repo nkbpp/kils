@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<body>
+
+<table th:fragment="addsopsposle_popup(id)">
+    <tr>
+        <td> Страхователь </td>
+        <td>
+            <input type="text" id="addsopsposlestrahovatel">
+        </td>
+    </tr>
+    <tr>
+        <td> Наименование </td>
+        <td>
+            <input type="text" id="addsopsposlename_org">
+        </td>
+    </tr>
+    <tr>
+        <td> Регистрационный номер ПФР </td>
+        <td>
+            <input type="text" id="addsopsposlereg_num_pfr">
+        </td>
+    </tr>
+    <tr>
+        <td class="afValue afCenter">
+            <input type="button"  value="Добавить"
+                   th:name="${id}"
+                   th:id="addsopsposle"></td>
+    </tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<body>
+
+<table th:fragment="sved_zar_do_popup(id)">
+    <tr>
+        <td> Номер справки: </td>
+        <td>
+            <input type="text" id="SvedZarDoNom_spravAdd">
+        </td>
+    </tr>
+    <tr>
+        <td> Дата справки: </td>
+        <td>
+            <input type="date" id="SvedZarDoData_spravAdd">
+        </td>
+    </tr>
+    <tr>
+        <td> Заработок за период с </td>
+        <td>
+            <input type="date" id="SvedZarDoPeriod_sAdd">
+        </td>
+    </tr>
+    <tr>
+        <td> Заработок за период по </td>
+        <td>
+            <input type="date" id="SvedZarDoPeriod_poAdd">
+        </td>
+    </tr>
+    <tr>
+        <td class="afValue afCenter">
+            <input type="button" value="Добавить"
+                   th:name="${id}"
+                   th:id="sved_zar_do">
+    </tr>
+</table>
+
+</body>
+</html>

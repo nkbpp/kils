@@ -1,0 +1,2181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>KILS</title>
+
+    <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+    <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <link type="text/css" rel="stylesheet" href="/webjars/materialize/1.0.0-rc.2/dist/css/materialize.min.css"/>
+
+    <script type="text/javascript" src="/webjars/jquery/3.3.1/jquery.js"></script>
+    <script type="text/javascript" src="/webjars/jquery-maskedinput/1.4.0/jquery.maskedinput.min.js"></script>
+
+    <script type="text/javascript">
+
+
+        let files;
+
+        /*        function replacer(el) {
+                    console.log("asd")
+                    el.value = el.value.replace(/\d+\.\d\d/g, '');
+                }*/
+
+        function success() {
+            document.location.href = "/kils/get_kart_graj?id=" + $("#kartgrajid").attr("name"); //обновить страниц
+        }
+
+        function masksnils() {
+            $('.mask-snils').mask('999-999-999 99');
+        }
+
+        function maskregnum() {
+            $('.mask-regnum').mask('999-999-999999');
+        }
+
+        function sopsdogetVid() {
+            $(".sopsdogetVid_dHide").each(function (a) {
+                $("#sopsdogetVid_dSelect" + $(this).attr('name').substring(14)).val($(this).val());
+                $("#sopsdogetVid_dSelect" + $(this).attr('name').substring(14)).formSelect()
+            })
+        }
+
+        $(document).ready(function () {
+            sopsdogetVid()
+
+            $('select').formSelect();//селекты
+
+            $('.mask-snils').mask('999-999-999 99');
+            $('.mask-regnum').mask('999-999-999999');
+
+            //xml2Staj
+            $('input.downloadStaj').on('click', function () {
+
+                let token = $('#_csrf').attr('content');
+                let header = $('#_csrf_header').attr('content');
+
+                let id = "x3" + $(this).attr('name')
+                console.log(id)
+                let url = $("#" + id).attr('href')
+                console.log(url)
+                $.ajax({
+                    url: url,
+                    dataType: 'binary',
+                    xhrFields: {
+                        'responseType': 'blob'
+                    },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader(header, token);
+                    },
+                    success: function (data, status, xhr) {
+                        let blob = new Blob([data], {type: xhr.getResponseHeader('Content-Type')});
+                        let link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        $.ajax({
+                            url: "/kils/find_kart_graj/downloadxml2/getFilename",
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader(header, token);
+                            },
+                        }).done(function (msg) {
+                            link.download = msg;
+                            link.click();
+                            return;
+                        }).fail(function (jqXHR, textStatus) {
+                        });
+                        return;
+                    }
+                });
+                return;
+            });
+
+            //xml2
+            $('input.download').on('click', function () {
+
+                let token = $('#_csrf').attr('content');
+                let header = $('#_csrf_header').attr('content');
+
+                let id = "x2" + $(this).attr('name')
+                console.log(id)
+                let url = $("#" + id).attr('href')
+                console.log(url)
+                $.ajax({
+                    url: url,
+                    dataType: 'binary',
+                    xhrFields: {
+                        'responseType': 'blob'
+                    },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader(header, token);
+                    },
+                    success: function (data, status, xhr) {
+                        let blob = new Blob([data], {type: xhr.getResponseHeader('Content-Type')});
+                        let link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        $.ajax({
+                            url: "/kils/find_kart_graj/downloadxml2/getFilename",
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader(header, token);
+                            },
+                        }).done(function (msg) {
+                            link.download = msg;
+                            link.click();
+                            return;
+                        }).fail(function (jqXHR, textStatus) {
+                        });
+                        return;
+                    }
+                });
+                return;
+            });
+
+            //тут ввод сумм
+            //$('[name=quantity]').bind("keyup input"/*"change keyup input click"*/, function() {
+            $("body").on('input', 'input', function () {
+                if ($(this).attr('name') == 'quantity') {
+                    this.value = this.value.replace(/[^0-9\.]/g, '');
+                    this.value = this.value.replace(/\.\./g, '.');
+                    if (this.value.match(/^\./)) {
+                        this.value = "";
+                    }
+                    if (this.value.match(/^\d+\.\d+\./) != null) {
+                        this.value = this.value.replace(/.*/, this.value.match(/^\d+\.\d+/));
+                    }
+                    //console.log("v",this.value)
+                    if (this.value.match(/^\d+\.\d\d/) != null) {
+                        this.value = this.value.replace(/.*/, this.value.match(/^\d+\.\d\d/));
+                        //console.log("все верно")
+                        $(this).blur();//фокус. вряд ли это удобно но так просили
+                        $(this).parent().parent().next().children().children().focus();
+                    }
+                }
+            });
+
+            $("body").on('click', 'input', function () {
+
+
+                //sopstable чекбоксы
+                if ($(this).hasClass('sopstablekorresh') || $(this).hasClass('sopstablekorrzap') ||
+                    $(this).hasClass('stajtablekorresh') || $(this).hasClass('stajtablekorrzap') ||
+                    $(this).hasClass('inoekor') ||
+                    $(this).hasClass('svedzargodkorresh') ||
+                    $(this).hasClass('svedzarposlekorresh') || $(this).hasClass('svedzarposlekorrzap')) {
+                    let cl = '';
+                    let url = '/kils/kart_graj/'
+
+                    if ($(this).hasClass('sopstablekorresh')) {
+                        cl = 'sopstablekorresh';
+                        url += 'sopstablekor';
+                    }
+                    if ($(this).hasClass('sopstablekorrzap')) {
+                        cl = 'sopstablekorrzap';
+                        url += 'sopstablekor';
+                    }
+
+                    if ($(this).hasClass('stajtablekorresh')) {
+                        cl = 'stajtablekorresh';
+                        url += 'stajtablekor';
+                    }
+                    if ($(this).hasClass('stajtablekorrzap')) {
+                        cl = 'stajtablekorrzap';
+                        url += 'stajtablekor';
+                    }
+
+                    if ($(this).hasClass('inoekor')) {
+                        cl = 'inoekor';
+                        url += 'inoekor';
+                    }
+
+                    if ($(this).hasClass('svedzargodkorresh')) {
+                        cl = 'svedzargodkorresh';
+                        url += 'svedzargodkorresh';
+                    }
+
+                    if ($(this).hasClass('svedzarposlekorresh')) {
+                        cl = 'svedzarposlekorresh';
+                        url += 'svedzarposlekor';
+                    }
+                    if ($(this).hasClass('svedzarposlekorrzap')) {
+                        cl = 'svedzarposlekorrzap';
+                        url += 'svedzarposlekor';
+                    }
+
+                    //if($(this).hasClass('sopstabledokorresh')) {cl = 'sopstablekorresh';url+='sopstablekor';}
+
+                    let id = $(this).attr('name')
+                    let ischeked = $(this).prop("checked") ? 1 : 0
+                    let param = "id=" + id +
+                        "&сl=" + cl +
+                        "&ischeked=" + ischeked;
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        console.log(msg)
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+
+                    console.log('сlass', cl)
+                    console.log('id', id)
+                    console.log('url', url)
+                    console.log('checked', ischeked)
+                }
+
+                //ДОБАВИТЬ
+                if ($(this).attr('id') == "sved_zar_do") {
+                    let param =
+                        "id=" + $(this).attr("name") +
+                        "&SvedZarDoNom_spravAdd=" + $("#SvedZarDoNom_spravAdd").val().toUpperCase() +
+                        "&SvedZarDoData_spravAdd=" + $("#SvedZarDoData_spravAdd").val() +
+                        "&SvedZarDoPeriod_sAdd=" + $("#SvedZarDoPeriod_sAdd").val() +
+                        "&SvedZarDoPeriod_poAdd=" + $("#SvedZarDoPeriod_poAdd").val();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sved_zar_do",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "addstaj") {
+                    let param =
+                        "id=" + $(this).attr("name") +
+                        "&addstajreg_nom=" + $("#addstajreg_nom").val() +
+                        "&addstajname=" + $("#addstajname").val().toUpperCase();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/addstaj",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#staj_place").load("/kils/kart_graj/staj_place", p, function () {
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "addsopsposle") {
+                    let param =
+                        "id=" + $(this).attr("name") +
+                        "&addsopsposlestrahovatel=" + $("#addsopsposlestrahovatel").val() +
+                        "&addsopsposlename_org=" + $("#addsopsposlename_org").val().toUpperCase() +
+                        "&addsopsposlereg_num_pfr=" + $("#addsopsposlereg_num_pfr").val();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/addsopsposle",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_posle_place").load("/kils/kart_graj/sops_posle_place", p, function () {
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "addsopsdo") {
+                    let param =
+                        "id=" + $(this).attr("name") +
+                        "&addsopsdoname_org=" + $("#addsopsdoname_org").val().toUpperCase() +
+                        "&addsopsdovid_d=" + $("#addsopsdovid_d").val();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/addsopsdo",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        $('.popup-fade').fadeOut();
+
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "sved_zar_god_add") {
+                    let param =
+                        "id=" + $(this).attr("name") +
+                        "&swedzargodGodAdd=" + $("#swedzargodGodAdd").val() +
+                        "&swedzargodJanuaryAdd=" + $("#swedzargodJanuaryAdd").val() +
+                        "&swedzargodFebruaryAdd=" + $("#swedzargodFebruaryAdd").val() +
+                        "&swedzargodMarchAdd=" + $("#swedzargodMarchAdd").val() +
+                        "&swedzargodAprilAdd=" + $("#swedzargodAprilAdd").val() +
+                        "&swedzargodMayAdd=" + $("#swedzargodMayAdd").val() +
+                        "&swedzargodJuneAdd=" + $("#swedzargodJuneAdd").val() +
+                        "&swedzargodJulyAdd=" + $("#swedzargodJulyAdd").val() +
+                        "&swedzargodAugustAdd=" + $("#swedzargodAugustAdd").val() +
+                        "&swedzargodSeptemberAdd=" + $("#swedzargodSeptemberAdd").val() +
+                        "&swedzargodOctoberAdd=" + $("#swedzargodOctoberAdd").val() +
+                        "&swedzargodNovemberAdd=" + $("#swedzargodNovemberAdd").val() +
+                        "&swedzargodDecemberAdd=" + $("#swedzargodDecemberAdd").val();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sved_zar_god_add",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "addSvedZarGodFromFile") {
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+                    // Создадим данные формы и добавим в них данные файлов из files
+                    if (files == undefined) {
+                        alert("Файл не выбран!");
+                        return 0;
+                    }
+
+                    let data = new FormData();
+                    $.each(files, function (key, value) {
+                        data.append("file", value);
+                    });
+
+                    data.append("id", $(this).attr("name"));
+
+                    let form = $("#addDocumentzForm");
+                    $.ajax({
+                        url: form.attr("action"),
+                        type: 'POST',
+                        data: data,
+                        cache: false,
+                        //dataType: 'json',
+                        dataType: 'text',
+                        processData: false, // Не обрабатываем файлы (Don't process the files)
+                        contentType: false, // Так jQuery скажет серверу что это строковой запрос
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        },
+                        success: function (respond, textStatus, jqXHR) {
+                            console.log(respond);
+                            $('#filedocz').val("");
+                            alert("Операция завершена! ");
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log('ОШИБКИ AJAX запроса: ' + textStatus);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    });
+                }
+
+                if ($(this).attr('id') == "sved_zar_posle_add") {
+                    console.log("sved_zar_posle_add")
+                    let param =
+                        "id=" + $(this).attr("name") +
+                        "&swedzarposleKatZLAdd=" + $("#swedzarposleKatZLAdd").val() +
+                        "&swedzarposleKodAdd=" + $("#swedzarposleKodAdd").val() +
+                        "&swedzarposleGodAdd=" + $("#swedzarposleGodAdd").val() +
+                        "&swedzarposleJanuaryAdd=" + $("#swedzarposleJanuaryAdd").val() +
+                        "&swedzarposleFebruaryAdd=" + $("#swedzarposleFebruaryAdd").val() +
+                        "&swedzarposleMarchAdd=" + $("#swedzarposleMarchAdd").val() +
+                        "&swedzarposleAprilAdd=" + $("#swedzarposleAprilAdd").val() +
+                        "&swedzarposleMayAdd=" + $("#swedzarposleMayAdd").val() +
+                        "&swedzarposleJuneAdd=" + $("#swedzarposleJuneAdd").val() +
+                        "&swedzarposleJulyAdd=" + $("#swedzarposleJulyAdd").val() +
+                        "&swedzarposleAugustAdd=" + $("#swedzarposleAugustAdd").val() +
+                        "&swedzarposleSeptemberAdd=" + $("#swedzarposleSeptemberAdd").val() +
+                        "&swedzarposleOctoberAdd=" + $("#swedzarposleOctoberAdd").val() +
+                        "&swedzarposleNovemberAdd=" + $("#swedzarposleNovemberAdd").val() +
+                        "&swedzarposleDecemberAdd=" + $("#swedzarposleDecemberAdd").val();
+                    console.log("param", param)
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sved_zar_posle_add",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_posle_place").load("/kils/kart_graj/sops_posle_place", p, function () {
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "stajtableadd") {
+                    let param =
+                        "idperson=" + $("#kartgrajid").attr("name") +
+                        "&idstaj=" + $(this).attr("name") +
+                        "&stajtableaddPeriod_s=" + $("#stajtableaddPeriod_s").val() +
+                        "&stajtableaddPeriod_po=" + $("#stajtableaddPeriod_po").val() +
+                        "&stajtableaddUvol=" + $("#stajtableaddUvol").val() +
+                        "&stajtableaddTer_usl=" + $("#stajtableaddTer_usl").val() +
+                        "&stajtableaddTer_usl_koef=" + $("#stajtableaddTer_usl_koef").val() +
+                        "&stajtableaddOsob_usl=" + $("#stajtableaddOsob_usl").val() +
+                        "&stajtableaddPoz_spis=" + $("#stajtableaddPoz_spis").val() +
+                        "&stajtableaddStrah_staj_osn=" + $("#stajtableaddStrah_staj_osn").val() +
+                        "&stajtableaddStrah_staj_dop_sved=" + $("#stajtableaddStrah_staj_dop_sved").val() +
+                        "&stajtableaddDosr_naz_strah_pens_osn=" + $("#stajtableaddDosr_naz_strah_pens_osn").val() +
+                        "&stajtableaddDosr_naz_strah_pens_dop_sved=" + $("#stajtableaddDosr_naz_strah_pens_dop_sved").val() +
+                        "&stajtableaddStrah_vzn=" + $("#stajtableaddStrah_vzn").val() +
+                        "&stajtableaddKod_zastr_lica=" + $("#stajtableaddKod_zastr_lica").val() +
+                        "&stajtableaddDataSniatia=" + $("#stajtableaddDataSniatia").val();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/stajtableadd",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#staj_place").load("/kils/kart_graj/staj_place", p, function () {
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "sopstableposleadd") {
+                    let param =
+                        "idperson=" + $("#kartgrajid").attr("name") +
+                        "&idsopsposle=" + $(this).attr("name") +
+                        "&sopstableposlePeriod_start=" + $("#sopstableposlePeriod_start").val() +
+                        "&sopstableposlePeriod_end=" + $("#sopstableposlePeriod_end").val() +
+                        "&sopstableposleTer_uslovija=" + $("#sopstableposleTer_uslovija").val() +
+                        "&sopstableposleTer_uslovija_koef=" + $("#sopstableposleTer_uslovija_koef").val() +
+                        "&sopstableposleOsob_uslovija=" + $("#sopstableposleOsob_uslovija").val() +
+                        "&poz_spis=" + $("#poz_spis").val() +
+                        "&sopstableposleTrud_staj_osn=" + $("#sopstableposleTrud_staj_osn").val() +
+                        "&sopstableposleTrud_staj_dopsved=" + $("#sopstableposleTrud_staj_dopsved").val() +
+                        "&sopstableposleVis_let_osn=" + $("#sopstableposleVis_let_osn").val() +
+                        "&sopstableposleVis_let_dopsved=" + $("#sopstableposleVis_let_dopsved").val();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sopstableposleadd",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_posle_place").load("/kils/kart_graj/sops_posle_place", p, function () {
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "sopstabledoadd") {
+                    let param =
+                        "idperson=" + $("#kartgrajid").attr("name") +
+                        "&idsopsdo=" + $(this).attr("name") +
+                        "&sopstabledoPeriod_start=" + $("#sopstabledoPeriod_start").val() +
+                        "&sopstabledoPeriod_end=" + $("#sopstabledoPeriod_end").val() +
+                        "&sopstabledoTer_uslovija=" + $("#sopstabledoTer_uslovija").val() +
+                        "&sopstabledoOsob_uslovija=" + $("#sopstabledoOsob_uslovija").val() +
+                        "&sopstabledoTrud_staj_osn=" + $("#sopstabledoTrud_staj_osn").val() +
+                        "&sopstabledoTrud_staj_dopsved=" + $("#sopstabledoTrud_staj_dopsved").val() +
+                        "&sopstabledoVis_let_osn=" + $("#sopstabledoVis_let_osn").val() +
+                        "&sopstabledoVis_let_dopsved=" + $("#sopstabledoVis_let_dopsved").val();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sopstabledoadd",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "sopsdoljnostadd") {
+                    let param =
+                        "idperson=" + $("#kartgrajid").attr("name") +
+                        "&idsopsdo=" + $(this).attr("name") +
+                        "&sopstabledoPeriod_start=" + $("#sopstabledoPeriod_start").val() +
+                        "&sopstabledoPeriod_end=" + $("#sopstabledoPeriod_end").val() +
+                        "&sopstabledoTer_uslovija=" + $("#sopstabledoTer_uslovija").val() +
+                        "&sopstabledoTer_uslovija_koef=" + $("#sopstabledoTer_uslovija_koef").val() +
+                        "&sopstabledoOsob_uslovija=" + $("#sopstabledoOsob_uslovija").val() +
+                        "&poz_spis=" + $("#poz_spis").val() +
+                        "&sopstabledoTrud_staj_osn=" + $("#sopstabledoTrud_staj_osn").val() +
+                        "&sopstabledoTrud_staj_dopsved=" + $("#sopstabledoTrud_staj_dopsved").val() +
+                        "&sopstabledoVis_let_osn=" + $("#sopstabledoVis_let_osn").val() +
+                        "&sdoljnostadd=" + $("#sdoljnostadd").val().toUpperCase() +
+                        "&sopstabledoVis_let_dopsved=" + $("#sopstabledoVis_let_dopsved").val();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sopsdoljnostadd",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "inoeadd") {
+                    let param =
+                        "idperson=" + $("#kartgrajid").attr("name") +
+                        "&inoeName=" + $("#inoeName").val().toUpperCase() +
+                        "&inoeReg_num=" + $("#inoeReg_num").val() +
+                        "&inoeInoe_period=" + $("#inoeInoe_period").val() +
+                        "&inoePeriod_start=" + $("#inoePeriod_start").val() +
+                        "&inoePeriod_end=" + $("#inoePeriod_end").val() +
+                        "&inoeSnils=" + $("#inoeSnils").val() +
+                        "&inoeData_roj=" + $("#inoeData_roj").val();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/inoeadd",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#inoe_place").load("/kils/kart_graj/inoe_place", p, function () {
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                //УДАЛИТЬ
+
+                if ($(this).attr('id') == "sopsposledelette") {
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id;
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sopsposledelette",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_posle_place").load("/kils/kart_graj/sops_posle_place", p, function () {
+                        });
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "deleteSvedZarDo") {
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id;
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/deleteSvedZarDo",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "deletteSvedGod") {
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id;
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/deletteSvedGod",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "deletteSvedZarPosle") {
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id;
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/deletteSvedZarPosle",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_posle_place").load("/kils/kart_graj/sops_posle_place", p, function () {
+                        });
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "inoedelette") {
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id;
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/inoedelette",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#inoe_place").load("/kils/kart_graj/inoe_place", p, function () {
+                        });
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "stajtabledelette") {
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id;
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/stajtabledelette",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#staj_place").load("/kils/kart_graj/staj_place", p, function () {
+                        });
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "sopsdoljnostdelette") {
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id;
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sopsdoljnostdelette",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_posle_place").load("/kils/kart_graj/sops_posle_place", p, function () {
+                        });
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "sopstabledelette") { //! НЕ УДАЛЯЕТ
+                    let id = $(this).attr('name');
+                    let param = "id=" + id;
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sopsposletabledelette",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_posle_place").load("/kils/kart_graj/sops_posle_place", p, function () {
+                        });
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "stajdelette") {
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id;
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/stajdelette",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#staj_place").load("/kils/kart_graj/staj_place", p, function () {
+                        });
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "sopsdodelette") {
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id;
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sopsdodelette",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                //ИЗМЕНИТЬ
+
+                if ($(this).attr('id') == "updateSvedZarDo") {
+                    let id = $(this).attr("name");
+                    let param =
+                        "id=" + id +
+                        "&SvedZarDoNom_sprav=" + $("#SvedZarDoNom_sprav" + id).val() +
+                        "&SvedZarDoData_sprav=" + $("#SvedZarDoData_sprav" + id).val() +
+                        "&SvedZarDoPeriod_s=" + $("#SvedZarDoPeriod_s" + id).val() +
+                        "&SvedZarDoPeriod_po=" + $("#SvedZarDoPeriod_po" + id).val();
+                    console.log(param);
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/updateSvedZarDo",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "sved_zar_god_update") {
+                    let param =
+                        "id=" + $(this).attr("name") +
+                        "&swedzargodGodUpd=" + ($("#swedzargodGodUpd").val() == undefined ? "" : $("#swedzargodGodUpd").val()) +
+                        "&swedzargodJanuaryUpd=" + ($("#swedzargodJanuaryUpd").val() == undefined ? "" : $("#swedzargodJanuaryUpd").val()) +
+                        "&swedzargodFebruaryUpd=" + ($("#swedzargodFebruaryUpd").val() == undefined ? "" : $("#swedzargodFebruaryUpd").val()) +
+                        "&swedzargodMarchUpd=" + ($("#swedzargodMarchUpd").val() == undefined ? "" : $("#swedzargodMarchUpd").val()) +
+                        "&swedzargodAprilUpd=" + ($("#swedzargodAprilUpd").val() == undefined ? "" : $("#swedzargodAprilUpd").val()) +
+                        "&swedzargodMayUpd=" + ($("#swedzargodMayUpd").val() == undefined ? "" : $("#swedzargodMayUpd").val()) +
+                        "&swedzargodJuneUpd=" + ($("#swedzargodJuneUpd").val() == undefined ? "" : $("#swedzargodJuneUpd").val()) +
+                        "&swedzargodJulyUpd=" + ($("#swedzargodJulyUpd").val() == undefined ? "" : $("#swedzargodJulyUpd").val()) +
+                        "&swedzargodAugustUpd=" + ($("#swedzargodAugustUpd").val() == undefined ? "" : $("#swedzargodAugustUpd").val()) +
+                        "&swedzargodSeptemberUpd=" + ($("#swedzargodSeptemberUpd").val() == undefined ? "" : $("#swedzargodSeptemberUpd").val()) +
+                        "&swedzargodOctoberUpd=" + ($("#swedzargodOctoberUpd").val() == undefined ? "" : $("#swedzargodOctoberUpd").val()) +
+                        "&swedzargodNovemberUpd=" + ($("#swedzargodNovemberUpd").val() == undefined ? "" : $("#swedzargodNovemberUpd").val()) +
+                        "&swedzargodDecemberUpd=" + ($("#swedzargodDecemberUpd").val() == undefined ? "" : $("#swedzargodDecemberUpd").val());
+                    console.log(param);
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sved_zar_god_update",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "sved_zar_posle_update") {
+                    let param =
+                        "id=" + $(this).attr("name") +
+                        "&swedzarposleKatZLUpd=" + ($("#swedzarposleKatZLUpd").val() == undefined ? "" : $("#swedzarposleKatZLUpd").val()) +
+                        "&swedzarposleKodUpd=" + ($("#swedzarposleKodUpd").val() == undefined ? "" : $("#swedzarposleKodUpd").val()) +
+                        "&swedzarposleGodUpd=" + ($("#swedzarposleGodUpd").val() == undefined ? "" : $("#swedzarposleGodUpd").val()) +
+                        "&swedzarposleJanuaryUpd=" + ($("#swedzarposleJanuaryUpd").val() == undefined ? "" : $("#swedzarposleJanuaryUpd").val()) +
+                        "&swedzarposleFebruaryUpd=" + ($("#swedzarposleFebruaryUpd").val() == undefined ? "" : $("#swedzarposleFebruaryUpd").val()) +
+                        "&swedzarposleMarchUpd=" + ($("#swedzarposleMarchUpd").val() == undefined ? "" : $("#swedzarposleMarchUpd").val()) +
+                        "&swedzarposleAprilUpd=" + ($("#swedzarposleAprilUpd").val() == undefined ? "" : $("#swedzarposleAprilUpd").val()) +
+                        "&swedzarposleMayUpd=" + ($("#swedzarposleMayUpd").val() == undefined ? "" : $("#swedzarposleMayUpd").val()) +
+                        "&swedzarposleJuneUpd=" + ($("#swedzarposleJuneUpd").val() == undefined ? "" : $("#swedzarposleJuneUpd").val()) +
+                        "&swedzarposleJulyUpd=" + ($("#swedzarposleJulyUpd").val() == undefined ? "" : $("#swedzarposleJulyUpd").val()) +
+                        "&swedzarposleAugustUpd=" + ($("#swedzarposleAugustUpd").val() == undefined ? "" : $("#swedzarposleAugustUpd").val()) +
+                        "&swedzarposleSeptemberUpd=" + ($("#swedzarposleSeptemberUpd").val() == undefined ? "" : $("#swedzarposleSeptemberUpd").val()) +
+                        "&swedzarposleOctoberUpd=" + ($("#swedzarposleOctoberUpd").val() == undefined ? "" : $("#swedzarposleOctoberUpd").val()) +
+                        "&swedzarposleNovemberUpd=" + ($("#swedzarposleNovemberUpd").val() == undefined ? "" : $("#swedzarposleNovemberUpd").val()) +
+                        "&swedzarposleDecemberUpd=" + ($("#swedzarposleDecemberUpd").val() == undefined ? "" : $("#swedzarposleDecemberUpd").val());
+                    console.log(param);
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sved_zar_posle_update",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_posle_place").load("/kils/kart_graj/sops_posle_place", p, function () {
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "sopstableupdatepopup") {
+                    let param =
+                        "idsopstable=" + $(this).attr("name") +
+                        "&sopstablePeriod_startupd=" + $("#sopstablePeriod_startupd").val() +
+                        "&sopstablePeriod_endupd=" + $("#sopstablePeriod_endupd").val() +
+                        "&sopstableTer_uslovijaupd=" + $("#sopstableTer_uslovijaupd").val() +
+                        "&sopstableTer_uslovijaupd_koef=" + $("#sopstableTer_uslovijaupd_koef").val() +
+                        "&sopstableOsob_uslovijaupd=" + $("#sopstableOsob_uslovijaupd").val() +
+                        "&poz_spis=" + $("#poz_spis").val() +
+                        "&sopstableTrud_staj_osnupd=" + $("#sopstableTrud_staj_osnupd").val() +
+                        "&sopstableTrud_staj_dopsvedupd=" + $("#sopstableTrud_staj_dopsvedupd").val() +
+                        "&sopstableVis_let_osnupd=" + $("#sopstableVis_let_osnupd").val() +
+                        "&sopstableVis_let_dopsvedupd=" + $("#sopstableVis_let_dopsvedupd").val();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sopstableupdate",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_posle_place").load("/kils/kart_graj/sops_posle_place", p, function () {
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "sopsdoljnostupdatepopup") {
+                    let param =
+                        "iddoljnost=" + $(this).attr("name") +
+                        "&sopstablePeriod_startupd=" + $("#sopstablePeriod_startupd").val() +
+                        "&sopstablePeriod_endupd=" + $("#sopstablePeriod_endupd").val() +
+                        "&sopstableTer_uslovijaupd=" + $("#sopstableTer_uslovijaupd").val() +
+                        "&sopstableTer_uslovijaupd_koef=" + $("#sopstableTer_uslovijaupd_koef").val() +
+                        "&sopstableOsob_uslovijaupd=" + $("#sopstableOsob_uslovijaupd").val() +
+                        "&sopstableTrud_staj_osnupd=" + $("#sopstableTrud_staj_osnupd").val() +
+                        "&sopstableTrud_staj_dopsvedupd=" + $("#sopstableTrud_staj_dopsvedupd").val() +
+                        "&sopstableVis_let_osnupd=" + $("#sopstableVis_let_osnupd").val() +
+                        "&poz_spis=" + $("#poz_spis").val() +
+                        "&sopsdoljnostupd=" + $("#sopsdoljnostupd").val().toUpperCase() +
+                        "&sopstableVis_let_dopsvedupd=" + $("#sopstableVis_let_dopsvedupd").val();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sopsdoljnostupdate",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_posle_place").load("/kils/kart_graj/sops_posle_place", p, function () {
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "stajtableupdatepopup") {
+                    let param =
+                        "idstajtable=" + $(this).attr("name") +
+                        "&stajtableupdatePeriod_s=" + $("#stajtableupdatePeriod_s").val() +
+                        "&stajtableupdatePeriod_po=" + $("#stajtableupdatePeriod_po").val() +
+                        "&stajtableupdateUvol=" + $("#stajtableupdateUvol").val() +
+                        "&stajtableupdateTer_usl=" + $("#stajtableupdateTer_usl").val() +
+                        "&stajtableupdateTer_usl_koef=" + $("#stajtableupdateTer_usl_koef").val() +
+                        "&stajtableupdateOsob_usl=" + $("#stajtableupdateOsob_usl").val() +
+                        "&stajtableupdatePoz_spis=" + $("#stajtableupdatePoz_spis").val() +
+                        "&stajtableupdateStrah_staj_osn=" + $("#stajtableupdateStrah_staj_osn").val() +
+                        "&stajtableupdateStrah_staj_dop_sved=" + $("#stajtableupdateStrah_staj_dop_sved").val() +
+                        "&stajtableupdateDosr_naz_strah_pens_osn=" + $("#stajtableupdateDosr_naz_strah_pens_osn").val() +
+                        "&stajtableupdateDosr_naz_strah_pens_dop_sved=" + $("#stajtableupdateDosr_naz_strah_pens_dop_sved").val() +
+                        "&stajtableupdateStrah_vzn=" + $("#stajtableupdateStrah_vzn").val() +
+                        "&stajtableupdateKod_zastr_lica=" + $("#stajtableupdateKod_zastr_lica").val() +
+                        "&stajtableupdateDataSniatia=" + $("#stajtableupdateDataSniatia").val();
+                    console.log(param);
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/stajtableupdate",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#staj_place").load("/kils/kart_graj/staj_place", p, function () {
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "inoetableupdatepopup") {
+                    let param =
+                        "idinoe=" + $(this).attr("name") +
+                        "&inoeNameupdate=" + $("#inoeNameupdate").val().toUpperCase() +
+                        "&inoeReg_numupdate=" + $("#inoeReg_numupdate").val() +
+                        "&inoeInoe_periodupdate=" + $("#inoeInoe_periodupdate").val() +
+                        "&inoePeriod_startupdate=" + $("#inoePeriod_startupdate").val() +
+                        "&inoePeriod_endupdate=" + $("#inoePeriod_endupdate").val() +
+                        "&inoeSnilsupdate=" + $("#inoeSnilsupdate").val() +
+                        "&inoeData_rojupdate=" + $("#inoeData_rojupdate").val();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/inoetableupdate",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        //success();
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#inoe_place").load("/kils/kart_graj/inoe_place", p, function () {
+                        });
+                        $('.popup-fade').fadeOut();
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "stajupdatename") {
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id +
+                        "&stajgetReg_nom=" + $("[name='stajgetReg_nom" + id + "']").val() +
+                        "&stajgetName=" + $("[name='stajgetName" + id + "']").val().toUpperCase();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/stajupdatename",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#staj_place").load("/kils/kart_graj/staj_place", p, function () {
+                        });
+                        $('.popup-fade').fadeOut();
+                        alert(msg);
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "sopsposleupdatename") {
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id +
+                        "&sopsposlegetStrahovatel=" + $("[name='sopsposlegetStrahovatel" + id + "']").val() +
+                        "&sopsposlegetName_org=" + $("[name='sopsposlegetName_org" + id + "']").val().toUpperCase() +
+                        "&sopsposlegetReg_num_pfr=" + $("[name='sopsposlegetReg_num_pfr" + id + "']").val();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sopsposleupdatename",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_posle_place").load("/kils/kart_graj/sops_posle_place", p, function () {
+                        });
+                        $('.popup-fade').fadeOut();
+                        alert(msg);
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                    ;
+                }
+
+                if ($(this).attr('id') == "sopsdoupdateDoljnost") {
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id +
+                        "&sopsdogetDoljnost=" + $("[name='sopsdogetDoljnost" + id + "']").val().toUpperCase();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sopsdoupdateDoljnost",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        $('.popup-fade').fadeOut();
+                        alert(msg);
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "sopsdoupdatename") {
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id +
+                        "&sopsdogetName_org=" + $("[name='sopsdogetName_org" + id + "']").val().toUpperCase() +
+                        "&sopsdogetVid_d=" + $("#sopsdogetVid_dSelect" + id).val();
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/sopsdoupdatename",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        let p = "id=" + $("#kartgrajid").attr('name');
+                        $("#sops_do_place").load("/kils/kart_graj/sops_do_place", p, function () {
+                            sopsdogetVid()
+                        });
+                        $('.popup-fade').fadeOut();
+                        alert(msg);
+                        return;
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                if ($(this).attr('id') == "peopleUpdate") {
+                    let param =
+                        "id=" + $("#peopleUpdate").attr('name') +
+                        "&peoplegetFam=" + $("#peoplegetFam").val().toUpperCase() +
+                        "&peoplegetName=" + $("#peoplegetName").val().toUpperCase() +
+                        "&peoplegetOtch=" + $("#peoplegetOtch").val().toUpperCase() +
+                        "&peoplegetPol=" + $("#peoplegetPol").val() +
+                        "&peoplegetDatebirthday=" + $("#peoplegetDatebirthday").val() +
+                        "&peoplegetSnils=" + $("#peoplegetSnils").val() +
+                        "&nameTO=" + $("#nameTO").val() +
+                        "&dataAct=" + $("#dataAct").val() +
+                        "&nomAct=" + $("#nomAct").val()
+                    ;
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/peopleUpdate",
+                        data: param,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        }
+                    }).done(function (msg) {
+                        if (typeof parseInt(msg) == 'number') {
+                            $("#kartgrajid").attr('name', msg);
+                            alert("Данные успешно сохранены!");
+                        } else {
+                            alert(msg);
+                        }
+
+                    }).fail(function (jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+                }
+
+                //Открытие модальных окон
+
+                //sved_zar_god
+
+                if ($(this).attr('id') == "addSvedZarGod_popup") {
+                    let param =
+                        "id=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/addSvedZarGod_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+                if ($(this).attr('id') == "updateSvedZarGod_popup") {
+                    let param =
+                        "id=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/updateSvedZarGod_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+
+                //sved_zar_posle
+
+                if ($(this).attr('id') == "addSvedZarPosle_popup") {
+                    let param =
+                        "id=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/addSvedZarPosle_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+                if ($(this).attr('id') == "updateSvedZarPosle_popup") {
+                    let param =
+                        "id=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/updateSvedZarPosle_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+
+                //иное
+                if ($(this).attr('id') == "inoetableupdatemodalopen") {
+                    let param =
+                        "idinoe=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/inoetableupdate_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+                if ($(this).attr('id') == "inoetableaddmodalopen") {
+                    let param =
+                        "idinoe=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/inoetableadd_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+
+                //стаж
+                if ($(this).attr('id') == "stajtableupdatemodalopen") {
+                    let param =
+                        "idstajtable=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/stajtableupdate_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                        $('select').formSelect();//селекты
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+                if ($(this).attr('id') == "stajtableadd_popup") {
+                    let param =
+                        "id=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/stajtableadd_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                        $('select').formSelect();//селекты
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+
+                //sopsdodoljnost
+                if ($(this).attr('id') == "sopsdoljnostupdatemodalopen") {
+                    let param =
+                        "iddoljnost=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/sopsdoljnostupdate_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                        $('select').formSelect();//селекты
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+
+
+                //sopstable
+                if ($(this).attr('id') == "sopstableupdatemodalopen") {
+                    let param =
+                        "idsopstable=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/sopstableupdate_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                        $('select').formSelect();//селекты
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+                if ($(this).attr('id') == "sopstabledoaddmodalopen") {
+                    let param =
+                        "id=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/sopstabledoadd_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+                if ($(this).attr('id') == "sopsdoljnostadd_popup") {
+                    let param =
+                        "id=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/sopsdoljnostadd_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                        //$('select').formSelect();//селекты
+
+                        //выбор вида деятельности автоматически
+                        let vidD = $("[name='sopsdogetVid_d" + $("#sopsdoljnostadd_popup").attr('name') + "'").val()
+                        //console.log("vd",vidD)
+
+                        $("#sopstabledoTrud_staj_dopsved").val(vidD);
+                        $('select').formSelect();//селекты
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+                if ($(this).attr('id') == "sopstableposleaddmodalopen") {
+                    let param =
+                        "id=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/sopstableposleadd_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                        $('select').formSelect();//селекты
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+
+                //загрузка из файла
+                if ($(this).attr('id') == "addSvedZarGodFromFilemodalopen") {
+                    let param =
+                        "idsvedzar=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/addSvedZarGodFromFile_popup", param, function () {
+                        $('input[type=file]').change(function () {
+                            files = this.files;
+                        });
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+
+                //вместе
+                if ($(this).attr('id') == "addsopsdo_popup") {
+                    let param =
+                        "id=" + $("#kartgrajid").attr('name');
+                    $("#popupadd").load("/kils/kart_graj/addsopsdo_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                        $('select').formSelect();//селекты
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+                if ($(this).attr('id') == "addsopsposle_popup") {
+                    let param =
+                        "id=" + $("#kartgrajid").attr('name');
+                    $("#popupadd").load("/kils/kart_graj/addsopsposle_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+                if ($(this).attr('id') == "addstaj_popup") {
+                    let param =
+                        "id=" + $("#kartgrajid").attr('name');
+                    $("#popupadd").load("/kils/kart_graj/addstaj_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+                if ($(this).attr('id') == "sved_zar_do_popup") {
+                    let param =
+                        "id=" + $(this).attr('name');
+                    $("#popupadd").load("/kils/kart_graj/sved_zar_do_popup", param, function () {
+                        masksnils();
+                        maskregnum();
+
+                    });
+                    $('.popup-fade').fadeIn();
+                    return false;
+                }
+            });
+
+            //МОДАЛЬНОЕ ОКНО +
+            // Клик по ссылке "Закрыть".
+            $('.popup-close').click(function () {
+                $(this).parents('.popup-fade').fadeOut();
+                return false;
+            });
+            // Закрытие по клавише Esc.
+            $(document).keydown(function (e) {
+                if (e.keyCode === 27) {
+                    e.stopPropagation();
+                    $('.popup-fade').fadeOut();
+                }
+            });
+            // Клик по фону, но не по окну.
+            $('.popup-fade').click(function (e) {
+                if ($(e.target).closest('.popup').length == 0) {
+                    $(this).fadeOut();
+                }
+            });
+            //МОДАЛЬНОЕ ОКНО -
+
+        });
+    </script>
+    <style>
+
+        .popup-fade {
+            display: none;
+        }
+
+        .popup-fade:before {
+            content: '';
+            background: #000;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.7;
+            z-index: 9999;
+        }
+
+        .popup {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            padding: 20px;
+            width: 460px;
+            margin-left: -250px;
+            background: #fff;
+            border: 1px solid orange;
+            border-radius: 4px;
+            z-index: 99999;
+            opacity: 1;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        @page {
+            size: A4 Landscape;
+            margin: 1cm 1cm 3cm 1cm;
+            @bottom-center {
+                font-family: Arial, "Helvetica CY", "Nimbus Sans L", Tahoma, Verdana, Segoe, sans-serif;
+                font-size: 0.7em;
+                content: "Страница " counter(page) " из " counter(pages);
+            }
+        }
+
+        .afNoBreakInside {
+            page-break-inside: avoid;
+        }
+
+        /*Стиль применяется к родительским элементам, для которых нужно установить ограничение по появлению разрыва страницы*/
+        .afNoFloat {
+            float: none;
+        }
+
+        .afNoBreakAfter {
+            page-break-after: avoid;
+        }
+
+        .afNoBreakBefore {
+            page-break-before: avoid;
+        }
+
+        div#break {
+            page-break-before: always;
+        }
+
+        .afPlainText,
+        .afC,
+        .afHeader,
+        .afHeader2,
+        .afHeader3,
+        .afSubscript,
+        .afItalic,
+        .afValue,
+        .afTable,
+        .afSmallFontTable,
+        .afColumn,
+        .afP,
+        .afCenter,
+        .afWordBreak,
+        .afParagraph,
+        .afRow,
+        .afRow50,
+        .afUnderline,
+        .afFootnote,
+        .afCol-1-4,
+        .afCol-1-2,
+        .afCol-1-3,
+        .afCol-2-3,
+        .afCol-3-4,
+        .afCol-1-10,
+        .afCol-8-10,
+        .afCol-9-10,
+        .afCol-1-6,
+        p {
+            font-family: Arial;
+            padding: 0;
+            font-size: 10pt;
+        }
+
+        .afVerticalTop {
+            vertical-align: top;
+        }
+
+        .afC {
+            float: left;
+            margin-left: 5px;
+        }
+
+        .afRight-1-4 {
+            float: right;
+            margin: 0;
+            width: 25%;
+        }
+
+        .afRight-1-3 {
+            float: right;
+            margin: 0;
+            width: 33.3333333333%;
+        }
+
+        .afRight-1-2 {
+            float: right;
+            margin: 0;
+            width: 50%;
+        }
+
+        .afAlignRight {
+            text-align: right;
+        }
+
+        .afHeader {
+            font-size: 14pt;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .afHeader2,
+        .afHeader3 {
+            font-size: 12pt;
+            font-weight: bold;
+            padding-top: 10pt;
+        }
+
+        .afSubscript {
+            font-style: italic;
+            font-size: 0.8333333em;
+            padding: 0;
+            margin: 0;
+            line-height: 1em;
+        }
+
+        .afItalic {
+            font-style: italic;
+        }
+
+        .afValue {
+            font-weight: bold;
+        }
+
+        .afUnderlinedBlock,
+        .afBlankUnderlinedBlock,
+        .afUnderlinedLeftBlock {
+            border-bottom: 1px black solid;
+            width: auto;
+            text-align: center;
+            overflow: hidden;
+            vertical-align: bottom;
+        }
+
+        .afBlankUnderlinedBlock {
+            height: 16px;
+        }
+
+        .afMarginLeft50 {
+            margin-left: 50px;
+        }
+
+        .afMarginLeft100 {
+            margin-left: 100px;
+        }
+
+        .afMarginLeft200 {
+            margin-left: 200px;
+        }
+
+        .afMarginLeft300 {
+            margin-left: 300px;
+        }
+
+        .afMarginLeft400 {
+            margin-left: 400px;
+        }
+
+        .afUnderlinedLeftBlock {
+            text-align: left;
+            clear: both;
+        }
+
+        .afPadding {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .afInterval {
+            padding: 5px;
+            clear: both;
+            margin: 0;
+        }
+
+        .afUnderline {
+            text-decoration: underline;
+        }
+
+        .afSmallSize {
+            font-size: 0.8333333em;
+        }
+
+        .afFootnote {
+            font-size: 0.8333333em;
+            text-indent: 30px;
+        }
+
+        .afLine {
+            border-top: 1px dashed #000;
+        }
+
+        .afWrap {
+            width: 100%;
+            font-size: 13px;
+        }
+
+        .afP {
+            clear: both;
+        }
+
+        .afCenter {
+            text-align: center;
+        }
+
+        .afWordBreak {
+            word-wrap: break-word;
+        }
+
+        .afCenterBlock {
+            text-align: center;
+        }
+
+        .afRow {
+            width: 100%;
+            float: left;
+        }
+
+        .afRow30 {
+            float: left;
+            margin-left: 30px;
+            width: 100%;
+        }
+
+        .afRow50 {
+            float: left;
+            margin-left: 50px;
+            width: 100%;
+        }
+
+        .afBox {
+            border: solid 1px black;
+            width: 98%;
+            padding: 10px;
+            float: left;
+        }
+
+        .afFrame {
+            border: solid 1px black;
+            float: left;
+        }
+
+        .afCol-1-4 {
+            float: left;
+            width: 25%;
+            margin: 0;
+        }
+
+        .afCol-1-6 {
+            float: left;
+            width: 16.6666666667%;
+            margin: 0;
+        }
+
+        .afCol-1-2 {
+            float: left;
+            width: 50%;
+            margin: 0;
+        }
+
+        .afCol2-1-2 {
+            float: left;
+            width: 48%;
+            margin: 0;
+        }
+
+        .afCol-1-3 {
+            float: left;
+            width: 33.3333333333%;
+            margin: 0;
+        }
+
+        .afCol-2-3 {
+            float: left;
+            width: 66.6666666667%;
+            margin: 0;
+        }
+
+        .afCol-3-4 {
+            float: left;
+            width: 75%;
+            margin: 0;
+        }
+
+        .afCol-1-10 {
+            float: left;
+            width: 5%;
+            margin: 0 2%;
+        }
+
+        .afCol-9-10 {
+            float: left;
+            width: 90%;
+            margin: 0;
+        }
+
+        .afCol-8-10 {
+            float: left;
+            width: 80%;
+            margin: 0;
+        }
+
+        .afTableRight {
+            float: right;
+            margin: 0;
+        }
+
+        .afTable {
+            border-collapse: collapse;
+            border: 1px solid black;
+            font-size: 8pt;
+        }
+
+        .afTable td, .afTable th {
+            border: 1px solid black;
+            padding: 5px;
+            font-size: 8pt;
+        }
+
+        .afTable td p {
+            margin: 0 0 0 0;
+            padding: 0 0 0 0;
+            font-size: 8pt;
+        }
+
+        .afSmallFontTable {
+            border-collapse: collapse;
+            border: 1px solid black;
+            font-size: 7pt;
+        }
+
+        .afSmallFontTable td, .afSmallFontTable th {
+            border: 1px solid black;
+            padding: 5px;
+            font-size: 7pt;
+            line-height: 0.95em;
+        }
+
+        .afSmallFontTable td p {
+            margin: 0 0 0 0;
+            padding: 0 0 0 0;
+            font-size: 7pt;
+            line-height: 1em;
+        }
+
+        .afParagraph {
+            margin: 0 0 0 0;
+            padding: 0 0 0 0;
+        }
+
+        .afSup {
+            vertical-align: super;
+            font-size: 50%;
+        }
+
+        .afTextAlignRight {
+            text-align: right;
+        }
+
+        .afWidth100 {
+            width: 100%;
+        }
+
+    </style>
+    <link rel="stylesheet" th:href="@{/styles/full.css}"><!--мои локальные стили-->
+    <!--<link th:if="${roleList.indexOf('ROLE_DOWNLOAD')!=-1}" rel="stylesheet" th:href="@{/styles/getKartGrajDownload.css}">-->
+</head>
+<body>
+
+<div th:insert="fragment/logout :: logout(${user})"></div>
+<br>
+<div th:insert="menu/menu :: menu"></div>
+
+<h3 class="afHeader3"
+    th:name=${people.getId_people()}
+    th:id="kartgrajid">
+    Сведения о застрахованном лице:
+</h3>
+
+<div>
+
+    <div class="afRow">
+        <div class="afCol-1-2">
+            <div class="afCol-1-6">Фамилия</div>
+            <div class="afCol-1-3 afValue"> <!--afUnderlinedBlock" th:text=${people.getName()}>-->
+                <input id="peoplegetFam" type="text" th:value="${people.getFam()}">
+            </div>
+        </div>
+    </div>
+
+    <div class="afRow">
+        <div class="afCol-1-2">
+            <div class="afCol-1-6">Имя</div>
+            <div class="afCol-1-3">
+                <input id="peoplegetName" type="text" th:value="${people.getName()}">
+            </div>
+        </div>
+    </div>
+
+    <div class="afRow">
+        <div class="afCol-1-2">
+            <div class="afCol-1-6">Отчество</div>
+            <div class="afCol-1-3 afValue">
+                <input id="peoplegetOtch" type="text" th:value="${people.getOtch()}">
+            </div>
+        </div>
+    </div>
+
+    <div class="afRow">
+        <div class="afCol-1-2">
+            <div class="afCol-1-6">Пол</div>
+            <div class="afCol-1-3 afValue">
+                <select th:id="peoplegetPol">
+                    <option th:text="''" th:value="''"
+                            th:selected="${people.getPol()}==null ? true :
+                            (${people.getPol().equals('')} ? true :
+                            (${people.getPol().equals('Женский')} ? false :
+                             (${people.getPol().equals('Мужской')} ? false :
+                            true)))"
+                    ></option>
+                    <option th:text="Женский" th:value="Женский"
+                            th:selected="${people.getPol()}!=null ? ${people.getPol().equals('Женский')} : false"
+                    ></option>
+                    <option th:text="Мужской" th:value="Мужской"
+                            th:selected="${people.getPol()}!=null ? ${people.getPol().equals('Мужской')} : false">
+
+                    </option>
+                </select>
+                <!--<input id="peoplegetPol" type="text" th:value="${people.getPol()}">-->
+            </div>
+        </div>
+    </div>
+
+    <div class="afRow">
+        <div class="afCol-1-2">
+            <div class="afCol-1-6">Дата рождения</div>
+            <div class="afCol-1-3 afValue">
+                <input id="peoplegetDatebirthday" type="date" th:value="${people.getDate_birthday()}">
+            </div>
+        </div>
+    </div>
+
+    <div class="afRow">
+        <div class="afCol-1-2">
+            <div class="afCol-1-6">СНИЛС</div>
+            <div class="afCol-1-3 afValue">
+                <input id="peoplegetSnils" type="text" th:value="${people.getSnils()}"
+                       class="mask-snils">
+            </div>
+        </div>
+    </div>
+
+    <br>
+    <h3 class="afHeader3">Данные о АКТЕ</h3>
+    <div class="afRow">
+        <div class="afCol-1-2">
+            <div class="afCol-1-6">НаименованиеТО</div>
+            <div class="afCol-1-3 afValue">
+                <input id="nameTO" type="text" th:value="${people.getNameTOPFR()}">
+            </div>
+        </div>
+    </div>
+    <div class="afRow">
+        <div class="afCol-1-2">
+            <div class="afCol-1-6">ДатаАкта</div>
+            <div class="afCol-1-3 afValue">
+                <input id="dataAct" type="text" th:value="${people.getDataActRus()}">
+            </div>
+        </div>
+    </div>
+    <div class="afRow">
+        <div class="afCol-1-2">
+            <div class="afCol-1-6">НомерАкта</div>
+            <div class="afCol-1-3 afValue">
+                <input id="nomAct" type="text" th:value="${people.getNomAct()}">
+            </div>
+        </div>
+    </div>
+
+
+    <div class="afRow">
+        <div class="afCol-1-2">
+            <div class="afCol-1-6"><p></p></div>
+            <div class="afCol-1-3 afValue">
+                <input class="buttonadd" type="button" value="&#10004;" placeholder="Изменить"
+                       id="peopleUpdate" th:name=${people.getId_people()}>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="afHeader2">1. Сведения о трудовом стаже и заработке застрахованного лица до 1 января 2002 года</h2>
+<h3 class="afHeader3">1.1. Сведения о периодах трудовой или иной общественно полезной деятельности и заработке за период
+    до регистрации в системе обязательного пенсионного
+    страхования <input type="button" id="addsopsdo_popup" value="+" placeholder="Добавить"></h3>
+
+<div th:replace="kart_graj/sops_do_fragment :: sops_do(${people.getSops_dos()})"></div>
+
+<h3 class="afHeader3"> 1.2. Сведения о трудовом стаже и заработке за период после регистрации в системе обязательного
+    пенсионного страхования
+    <input type="button" id="addsopsposle_popup" value="+" placeholder="Добавить"></h3>
+
+<div th:replace="kart_graj/sops_posle_fragment :: sops_posle(${people.getSops_posles()})"></div>
+
+<h3 class="afHeader3"> Сведения о страховом стаже <input type="button" id="addstaj_popup" value="+"
+                                                         placeholder="Добавить"></h3>
+
+<div th:replace="kart_graj/staj_fragment :: staj(${people.getStajs()})"></div>
+
+<div th:replace="kart_graj/inoe_fragment :: inoe(${people.getInoes()})"></div>
+
+<div><a a href="/kils/find_kart_graj">Назад</a></div>
+
+<div class="popup-fade">
+    <div class="popup">
+        <a class="popup-close" href="#">Закрыть</a>
+        <div id="popupadd">
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/webjars/materialize/1.0.0-rc.2/dist/js/materialize.min.js"></script>
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+        if ([[${roleList.indexOf('ROLE_UPDATE')==-1}]]) {
+            $("input").attr("disabled", true);
+            $("input.download").attr("disabled", false);
+        } else {
+            if([[${roleList.indexOf('ROLE_DOWNLOAD')==-1}]])
+            $("input.download").addClass("hide");
+        }
+    });
+</script>
+
+
+</body>
+</html>

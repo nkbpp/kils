@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<body>
+
+<table th:fragment="addstaj_popup(id)">
+    <tr>
+        <td> Регистрационный номер </td>
+        <td>
+            <input type="text" id="addstajreg_nom">
+        </td>
+    </tr>
+    <tr>
+        <td> Наименование </td>
+        <td>
+            <input type="text" id="addstajname">
+        </td>
+    </tr>
+    <tr>
+        <td class="afValue afCenter">
+            <input type="button"  value="Добавить"
+                   th:name="${id}"
+                   th:id="addstaj"></td>
+    </tr>
+</table>
+
+    <table th:fragment="staj_popup_update(staj_table)">
+        <tr>
+            <td> Начало периода </td>
+            <td>
+                <input type="date" id="stajtableupdatePeriod_s" th:value="${staj_table.getPeriod_s()}">
+            </td>
+        </tr>
+        <tr>
+            <td> Конец периода </td>
+            <td>
+                <input type="date" id="stajtableupdatePeriod_po" th:value="${staj_table.getPeriod_po()}">
+            </td>
+        </tr>
+        <tr>
+            <td> Сведения об увольнении ЗЛ </td>
+            <td>
+                <input type="text" id="stajtableupdateUvol" th:value="${staj_table.getUvol()}">
+            </td>
+        </tr>
+        <tr>
+            <td> Территориальные условия </td>
+            <td>
+                <div th:replace="popup/spiski :: spiski(${terUsl},'stajtableupdateTer_usl','Территориальные условия')"></div>
+            </td>
+        </tr>
+        <tr>
+            <td> Территориальные условия коэффициент </td>
+            <td>
+                <input type="text" id="stajtableupdateTer_usl_koef" th:value="${staj_table.getTer_usl_koeff()}">
+            </td>
+        </tr>
+        <tr>
+            <td> Особые условия труда </td>
+            <td>
+                <div th:replace="popup/spiski :: spiski(${osobUslTr},'stajtableupdateOsob_usl','Особые условия труда')"></div>
+            </td>
+        </tr>
+        <tr>
+            <td> Позиция списка </td>
+            <td>
+                <input type="text" id="stajtableupdatePoz_spis" th:value="${staj_table.getPoz_spis()}">
+            </td>
+        </tr>
+        <tr>
+            <td> Исчисление страхового стажа Осн. </td>
+            <td>
+                <div th:replace="popup/spiski :: spiski(${ischisStaj},'stajtableupdateStrah_staj_osn','Исч. страхового стажа Осн.')"></div>
+            </td>
+        </tr>
+        <tr>
+            <td> Исчисление страхового стажа Доп. свед. </td>
+            <td>
+                <div th:replace="popup/spiski :: spiski(${ischisStajDop},'stajtableupdateStrah_staj_dop_sved','Исч. страхового стажа Осн.')"></div>
+                <!--<input type="text" id="stajtableupdateStrah_staj_dop_sved" th:value="${staj_table.getStrah_staj_dop_sved()}">-->
+            </td>
+        </tr>
+        <tr>
+            <td> Условия для досрочного назначения страховой пенсии Осн. </td>
+            <td>
+                <input type="text" id="stajtableupdateDosr_naz_strah_pens_osn" th:value="${staj_table.getDosr_naz_strah_pens_osn()}">
+            </td>
+        </tr>
+        <tr>
+            <td> Условия для досрочного назначения страховой пенсии Доп. свед. </td>
+            <td>
+                <input type="text" id="stajtableupdateDosr_naz_strah_pens_dop_sved" th:value="${staj_table.getDosr_naz_strah_pens_dop_sved()}">
+            </td>
+        </tr>
+        <tr>
+            <td> Сведения о начислении страховых взносов </td>
+            <td>
+                <input type="text" id="stajtableupdateStrah_vzn" th:value="${staj_table.getStrah_vzn()}">
+            </td>
+        </tr>
+        <tr>
+            <td> Код категории застрахованного лица </td>
+            <td>
+                <input type="text" id="stajtableupdateKod_zastr_lica" th:value="${staj_table.getKod_zastr_lica()}">
+            </td>
+        </tr>
+        <tr>
+            <td> Дата снятия с учета </td>
+            <td>
+                <input type="date" id="stajtableupdateDataSniatia" th:value="${staj_table.getDataSniatia()}">
+            </td>
+        </tr>
+        <tr>
+            <td class="afValue afCenter">
+            <input type="button"  value="Изменить"
+                   th:name="${staj_table.getId_staj_table()}"
+                   th:id="stajtableupdatepopup"></td>
+        </tr>
+    </table>
+
+    <table th:fragment="staj_popup_add(staj)">
+        <tr>
+            <td> Начало периода </td>
+            <td>
+                <input type="date" id="stajtableaddPeriod_s">
+            </td>
+        </tr>
+        <tr>
+            <td> Конец периода </td>
+            <td>
+                <input type="date" id="stajtableaddPeriod_po">
+            </td>
+        </tr>
+        <tr>
+            <td> Сведения об увольнении ЗЛ </td>
+            <td>
+                <input type="text" id="stajtableaddUvol">
+            </td>
+        </tr>
+        <tr>
+            <td> Территориальные условия </td>
+            <td>
+                <div th:replace="popup/spiski :: spiski(${terUsl},'stajtableaddTer_usl','Территориальные условия')"></div>
+            </td>
+        </tr>
+        <tr>
+            <td> Территориальные условия коэффициент </td>
+            <td>
+                <input type="text" id="stajtableaddTer_usl_koef">
+            </td>
+        </tr>
+        <tr>
+            <td> Особые условия труда </td>
+            <td>
+                <div th:replace="popup/spiski :: spiski(${osobUslTr},'stajtableaddOsob_usl','Особые условия труда')"></div>
+            </td>
+        </tr>
+        <tr>
+            <td> Позиция списка </td>
+            <td>
+                <input type="text" id="stajtableaddPoz_spis">
+            </td>
+        </tr>
+        <tr>
+            <td> Исчисление страхового стажа Осн. </td>
+            <td>
+                <div th:replace="popup/spiski :: spiski(${ischisStaj},'stajtableaddStrah_staj_osn','Исч. страхового стажа Осн.')"></div>
+            </td>
+        </tr>
+        <tr>
+            <td> Исчисление страхового стажа Доп. свед. </td>
+            <td>
+                <div th:replace="popup/spiski :: spiski(${ischisStajDop},'stajtableaddStrah_staj_dop_sved','Исч. страхового стажа Доп. свед.')"></div>
+                <!--<input type="text" id="stajtableaddStrah_staj_dop_sved">-->
+            </td>
+        </tr>
+        <tr>
+            <td> Условия для досрочного назначения страховой пенсии Осн. </td>
+            <td>
+                <input type="text" id="stajtableaddDosr_naz_strah_pens_osn">
+            </td>
+        </tr>
+        <tr>
+            <td> Условия для досрочного назначения страховой пенсии Доп. свед. </td>
+            <td>
+                <input type="text" id="stajtableaddDosr_naz_strah_pens_dop_sved">
+            </td>
+        </tr>
+        <tr>
+            <td> Сведения о начислении страховых взносов </td>
+            <td>
+                <input type="text" id="stajtableaddStrah_vzn">
+            </td>
+        </tr>
+        <tr>
+            <td> Код категории застрахованного лица </td>
+            <td>
+                <input type="text" id="stajtableaddKod_zastr_lica">
+            </td>
+        </tr>
+        <tr>
+            <td> Дата снятия с учета </td>
+            <td>
+                <input type="date" id="stajtableaddDataSniatia">
+            </td>
+        </tr>
+        <tr>
+            <td class="afValue afCenter">
+                <input type="button"  value="Добавить"
+                       th:name="${staj.getId_staj()}"
+                       th:id="stajtableadd">
+        </tr>
+    </table>
+
+</body>
+</html>

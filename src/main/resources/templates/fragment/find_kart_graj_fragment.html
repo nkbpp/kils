@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<body>
+
+<table name="file" th:fragment="find_kart_graj_fragment(people)">
+    <tr>
+        <th class="center">Фамилия</th>
+        <th class="center">Имя</th>
+        <th class="center">Отчество</th>
+        <th class="center">Дата рождения</th>
+        <th class="center">СНИЛС</th>
+        <th class="center">Изменить</th>
+        <th class="center">Скачать</th>
+        <th class="center">Статус</th>
+        <th class="center">Район</th>
+    </tr>
+
+    <tr id="zamtr" th:each="p : ${people}" th:id="${p.getId_people()}">
+        <td class="center" th:text="${p.getFam()}"></td>
+        <td class="center" th:text="${p.getName()}"></td>
+        <td class="center" th:text="${p.getOtch()}"></td>
+        <td class="center" th:text="${p.getDate_birthdayD()}"></td>
+        <td class="center" th:text="${p.getSnils()}"></td>
+        <td class="center">
+            <!--th:disabled="${(p.getStatus() >= 1 && roleList.indexOf('ROLE_UPDATE')==-1)}"-->
+            <input type="button" value="&#9998;" placeholder="Редактировать"
+                   th:disabled="${(p.getStatus() != 1 && roleList.indexOf('ROLE_UPDATE')==-1) || (p.getStatus() == 1 && roleList.indexOf('ROLE_DOWNLOAD')==-1)}"
+                   th:name="${p.getId_people()}"
+                   th:id="peopleupdate">
+            <!--th:disabled="${(p.getStatus() == 1 && roleList.indexOf('ROLE_UPDATE')==-1)}"-->
+            <input th:if="${roleList.indexOf('ROLE_UPDATE')!=-1}"
+                   type="button" value="&#10060;" placeholder="Удалить"
+                   th:name="${p.getId_people()}"
+                   th:id="peopledelette">
+        </td>
+        <td class="center">
+            <a th:if="${p.getStatus() == 1 && roleList.indexOf('ROLE_DOWNLOAD')!=-1}"
+               th:href="'/kils/find_kart_graj/downloadxml?idpeople='+${p.getId_people()}" download>xml</a>
+
+            <!--<a th:if="${p.getStatus() == 2 && roleList.indexOf('ROLE_UPDATE')!=-1}"-->
+            <a th:if="${p.getStatus() == 0 && roleList.indexOf('ROLE_UPDATE')!=-1}"
+               th:href="@{/kart_graj/shabresh(id=${p.getId_people()})}" download>реш</a>
+
+            <!--<a th:if="${p.getStatus() == 2 && roleList.indexOf('ROLE_UPDATE')!=-1}"-->
+            <a th:if="${p.getStatus() == 1 && roleList.indexOf('ROLE_DOWNLOAD')!=-1}"
+               th:href="@{/kart_graj/shabzap(id=${p.getId_people()})}" download>зап</a>
+        </td>
+        <td class="center" th:text="${p.getStatus()}"></td>
+        <td class="center tds">
+            <table class="findraytable">
+                <tr>
+                    <td th:if="${roleList.indexOf('ROLE_UPDATE')!=-1}" class="tds1">
+                        <div class="input-field selectray">
+                            <select th:name="${p.getId_people()}"
+                                    th:disabled="${(roleList.indexOf('ROLE_UPDATE')!=-1 && p.getStatus() >= 1)}">
+                                <option th:each="r : ${rayon}" th:value="${r.getId()}"
+                                        th:text="${r.getKod()}" th:selected="${p.isRayonKor(r)}"></option>
+                            </select>
+                            <label th:text="''"></label>
+                        </div>
+                    </td>
+                    <td class="tds2">
+                        <input type="button" value="+" placeholder="Изменить статус"
+                               th:disabled="${(p.getStatus() != 1 && roleList.indexOf('ROLE_UPDATE')==-1) || p.getStatus() == 2}"
+                               th:name="${p.getId_people()}"
+                               th:id="peopleupdatestatus">
+                    </td>
+                    <td class="tds2">
+                        <input th:if="${(p.getStatus() == 1  && roleList.indexOf('ROLE_DOWNLOAD')!=-1) || (p.getStatus() == 2  && roleList.indexOf('ROLE_UPDATE')!=-1)}"
+                               type="button" value="-" placeholder="Откатить"
+                               th:name="${p.getId_people()}"
+                               th:id="peoplebackstatus">
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

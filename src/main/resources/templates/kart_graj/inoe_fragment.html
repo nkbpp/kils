@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<body>
+
+<div  id="inoe_place" th:fragment="inoe(inoe)">
+
+    <h2 class="afHeader2"> 6. Сведения об иных периодах, засчитываемых в страховой стаж:</h2>
+
+    <!--    <div>
+            <input type="button" id="addinoe_popup" value="Добавить">
+        </div>-->
+
+    <table class="afTable">
+        <tr>
+            <td class="afCenter" rowspan="2"> № п/п</td>
+            <td class="afCenter" rowspan="2"> Наименование (краткое) территориального органа ПФР</td>
+            <td class="afCenter" rowspan="2"> Регистрационный номер ТО ПФР</td>
+            <td class="afCenter" rowspan="2"> Иные периоды (код)</td>
+            <td class="afCenter" rowspan="2"> Начало периода (дд.мм.гггг)</td>
+            <td class="afCenter" rowspan="2"> Конец периода (дд.мм.гггг)</td>
+            <td class="afCenter" colspan="2"> Сведения о ребенке/о нетрудоспособном лице, за которым осуществляется
+                уход
+            </td>
+            <td class="afCenter" rowspan="2">Действие</td>
+            <td class="afCenter" rowspan="2">Кор. р</td>
+        </tr>
+        <tr>
+            <td class="afCenter"> СНИЛС</td>
+            <td class="afCenter"> Дата рождения</td>
+        </tr>
+        <!--th:if="${people.getInoes() != null}"-->
+        <tr  th:each="i,state : ${inoe}">
+            <td class="afValue afCenter" th:text=${state.count}></td>
+            <td class="afValue afCenter" th:text=${i.getName()}>
+            </td>
+            <td class="afValue afCenter" th:text=${i.getReg_num()}>
+            </td>
+            <td class="afValue afCenter" th:text=${i.getInoe_period()}>
+            </td>
+            <td class="afValue afCenter" th:text=${i.getPeriod_startD()}>
+            </td>
+            <td class="afValue afCenter" th:text=${i.getPeriod_endD()}>
+            </td>
+            <td class="afValue afCenter" th:text=${i.getSnils()}>
+            </td>
+            <td class="afValue afCenter" th:text=${i.getData_rojD()}>
+            </td>
+            <td class="afValue afCenter">
+                <div style="display:flex">
+                    <input type="button" value="&#9998;" placeholder="Редактировать"
+                           th:name="${i.getId_inoe()}"
+                           th:id="inoetableupdatemodalopen">
+                    <input type="button" value="&#10060;" placeholder="Удалить"
+                           th:name="${i.getId_inoe()}"
+                           th:id="inoedelette">
+                </div>
+            </td>
+
+            <td class="afValue afCenter">
+                <label>
+                    <input type="checkbox" class="filled-in inoekor"
+                           th:name="${i.getId_inoe()}" th:id="inoekor"
+                           th:checked="${i.getIsreshkor()==1}" />
+                    <span class="marginonospan"></span>
+                </label>
+            </td>
+
+        </tr>
+
+        <tr>
+            <td colspan="10">
+                <input type="button" value="+" placeholder="Добавить"
+                       th:id="inoetableaddmodalopen">
+            </td>
+        </tr>
+
+    </table>
+    <hr>
+
+</div>
+
+</body>
+</html>

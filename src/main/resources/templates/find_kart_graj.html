@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+        <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>KILS</title>
+    <link type="text/css" rel="stylesheet" href="/webjars/materialize/1.0.0-rc.2/dist/css/materialize.min.css"/>
+
+    <script type="text/javascript" src="/webjars/jquery/3.3.1/jquery.js"></script>
+    <script type="text/javascript" src="/webjars/jquery-maskedinput/1.4.0/jquery.maskedinput.min.js"></script>
+
+    <script type="text/javascript">
+
+        function clearPagination() { // определяем функцию и ее механизм выполнения
+            //$("#pagination a").first().parent().removeClass("disabled").addClass("disabled");
+            $("#pagination a").eq(1).text("1").removeClass("active").addClass("active");
+            $("#pagination a").eq(2).text("2").removeClass("active");
+            $("#pagination a").eq(3).text("3").removeClass("active");
+            $("#pagination a").eq(4).text("4").removeClass("active");
+            $("#pagination a").eq(5).text("5").removeClass("active");
+        }
+
+        $(document).ready(function () {
+
+            $('.mask-snils').mask('999-999-999 99');
+
+            $('select').formSelect();//селекты
+
+            //переключатель снизу
+            $("#pagination").on('click', 'a', function () {
+                var list;
+                if ($(this).text() == "«") {
+                    clearPagination();
+                    list = 1;
+                } else //кнопка далее
+                if ($(this).text() == "»") {
+                    list = +$("#pagination a").eq(5).text() + 1;
+
+                    $("#pagination a").eq(1).text(list).removeClass("active").addClass("active");
+                    $("#pagination a").eq(2).text(+list + 1).removeClass("active");
+                    $("#pagination a").eq(3).text(+list + 2).removeClass("active");
+                    $("#pagination a").eq(4).text(+list + 3).removeClass("active");
+                    $("#pagination a").eq(5).text(+list + 4).removeClass("active");
+                } else {
+                    $("#pagination a.active").removeClass("active");
+                    $(this).addClass("active");
+                    list = $(this).text();
+                }
+
+                var param = "list=" + list +
+                            "&fam_rod=" + $("#fam_rod").val() +
+                            "&snils_rod=" + $("#snils_rod").val() +
+                            "&hreff=" + window.location.pathname;
+                $("table[name='file']").load("/kils/find_kart_graj_fragment", param, function () {
+                    $('select').formSelect();//селекты
+                        });
+            });
+
+            $("#table1").on('click', 'input', function () {
+                if ($(this).attr('type') == "button") {
+                    if($(this).attr('name') == "find"){
+                        let param =
+                            "fam_rod=" + $("#fam_rod").val() +
+                            "&snils_rod=" + $("#snils_rod").val() +
+                            "&hreff=" + window.location.pathname;
+
+                        $("table[name='file']").load("/kils/find_kart_graj_fragment", param, function () {
+                            $('select').formSelect();//селекты
+                        });
+                    }
+                }
+
+                if ($(this).attr('id') == "peopleupdate") {
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id;
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/peopleold",
+                        data: param,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader(header, token);
+                        },
+                    }).done(function( msg ) {
+                        document.location.href = "/kils/get_kart_graj?id=" + id;
+                        return;
+                    }).fail(function(jqXHR, textStatus) {
+                    });
+
+                }
+
+                if ($(this).attr('id') == "peopledelette") {
+
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    let id = $(this).attr('name');
+                    let param =
+                        "id=" + id;
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/peopledelette",
+                        data: param,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader(header, token);
+                        },
+                    }).done(function( msg ) {
+                        //success();
+                        param = "list=" + $("#pagination a.active").text() +
+                            "&fam_rod=" + $("#fam_rod").val() +
+                            "&snils_rod=" + $("#snils_rod").val() +
+                            "&hreff=" + window.location.pathname;
+                        $("table[name='file']").load("/kils/find_kart_graj_fragment", param, function () {
+                            $('select').formSelect();//селекты
+                        });
+                        return;
+                    }).fail(function(jqXHR, textStatus) {
+                        alert( "Request failed: " + textStatus );
+                    });
+
+                }
+
+                if ($(this).attr('id') == "peopleupdatestatus") {
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    let id = $(this).attr('name');
+                    let idray = $("select[name='"+id+"']").val();
+                    console.log("id",id)
+                    console.log("idray",idray)
+                    console.log("undefined",idray==undefined)
+                    if(idray==undefined){idray=-1}
+
+                    let param =
+                        "id=" + id +
+                        "&idray=" + idray +
+                        "&hreff=" + window.location.pathname;
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/peopleupdatestatus",
+                        data: param,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader(header, token);
+                        },
+                    }).done(function( msg ) {
+                        //success();
+                        param = "list=" + $("#pagination a.active").text() +
+                            "&fam_rod=" + $("#fam_rod").val() +
+                            "&snils_rod=" + $("#snils_rod").val() +
+                            "&hreff=" + window.location.pathname;
+                        $("table[name='file']").load("/kils/find_kart_graj_fragment", param, function () {
+                            $('select').formSelect();//селекты
+                        });
+
+                        return;
+                    }).fail(function(jqXHR, textStatus) {
+                        alert( "Request failed: " + textStatus );
+                    });
+                }
+
+                if ($(this).attr('id') == "peoplebackstatus") {
+                    let token = $('#_csrf').attr('content');
+                    let header = $('#_csrf_header').attr('content');
+
+                    let id = $(this).attr('name');
+                    let idray = $("select[name='"+id+"']").val();
+                    if(idray==undefined){idray=-1}
+                    let param =
+                        "id=" + id +
+                        "&idray=" + idray +
+                        "&hreff=" + window.location.pathname;
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/kils/kart_graj/peoplebackstatus",
+                        data: param,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader(header, token);
+                        },
+                    }).done(function( msg ) {
+                        //success();
+                        param = "list=" + $("#pagination a.active").text() +
+                            "&fam_rod=" + $("#fam_rod").val() +
+                            "&snils_rod=" + $("#snils_rod").val() +
+                            "&hreff=" + window.location.pathname;
+                        $("table[name='file']").load("/kils/find_kart_graj_fragment", param, function () {
+                            $('select').formSelect();//селекты
+                        });
+
+                        return;
+                    }).fail(function(jqXHR, textStatus) {
+                        alert( "Request failed: " + textStatus );
+                    });
+                }
+
+            });
+
+            $("body").on('click', 'button', function () {
+
+                    if($(this).attr('name') == "find"){
+                        let param =
+                            "fam_rod=" + $("#fam_rod").val() +
+                            "&snils_rod=" + $("#snils_rod").val() +
+                            "&hreff=" + window.location.pathname;
+
+                        $("table[name='file']").load("/kils/find_kart_graj_fragment", param, function () {
+                        });
+                    }
+
+            });
+
+
+
+        });
+    </script>
+
+    <style>
+        ul.pagination {
+            display: inline-block;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul.pagination li {display: inline;}
+
+        ul.pagination li a {
+            color: black;
+            float: left;
+            padding: 8px 16px;
+            text-decoration: none;
+        }
+
+        ul.pagination li a.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        ul.pagination li a:hover:not(.active) {background-color: #ddd;}
+    </style>
+
+    <link rel="stylesheet" th:href="@{/styles/full.css}"><!--мои локальные стили-->
+
+</head>
+<body>
+
+<div th:insert="fragment/logout :: logout(${user})"></div>
+<br>
+<div th:insert="menu/menu :: menu"></div>
+
+<br>
+
+<div>
+    <div class="row">
+        <div class="col s2 center">
+            Фамилия
+        </div>
+        <div class="col s2 center mask-snils">
+            СНИЛС
+        </div>
+        <div class="col s2">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s2">
+            <input class="fio" id="fam_rod" type="text">
+        </div>
+        <div class="col s2">
+            <input class="snils mask-snils" id="snils_rod" type="text">
+        </div>
+        <div class="col s2">
+            <button class="btn waves-effect waves-light" type="submit" name="find">Найти
+            </button>
+        </div>
+    </div>
+</div>
+<hr>
+
+<!--<table>
+
+    <tr>
+        <td><input type="text" class="fio" value="Фамилия" disabled ></td>
+        <td><input type="text" class="snils" value="СНИЛС" disabled ></td>
+
+        <td><input type="text" value="Найти" disabled ></td>
+    </tr>
+    <tr>
+        <td><input class="fio" id="fam_rod" type="text"></td>
+        <td><input class="snils" id="snils_rod" type="text"></td>
+
+        <td><input type="button" value="Поиск" name="find"></td>
+    </tr>
+</table>-->
+
+<br>
+<!--<div class="center">Результаты поиска</div>-->
+
+<div>
+    <table id="table1"  name="file" th:include="fragment/find_kart_graj_fragment :: find_kart_graj_fragment(${people})">
+    </table>
+</div>
+
+<div class="center" id="pagination" th:include="pagination/pagination :: pagination"></div>
+
+<!--<div><a a href="/kils/upfr_menu">Назад</a></div>-->
+<script type="text/javascript" src="/webjars/materialize/1.0.0-rc.2/dist/js/materialize.min.js"></script>
+
+<!--<script th:inline="javascript">
+    $(document).ready(function () {
+        if([[${roleList.indexOf('ROLE_DOWNLOAD')==-1}]]){
+            $("input").attr("disabled",true);
+            //$("input.download").attr("disabled",false);
+        }
+    });
+</script>-->
+
+</body>
+</html>

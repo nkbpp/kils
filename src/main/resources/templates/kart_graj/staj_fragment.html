@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<body>
+
+<div  id="staj_place" th:fragment="staj(staj)">
+
+    <p class="afInterval"></p>
+    <div id="break"></div>
+
+    <div th:each="s : ${staj}">
+        <div class="afNoFloat">
+            <div class="afRow">Регистрационный номер:
+                <input
+                        th:name="stajgetReg_nom + ${s.getId_staj()}" type="text"
+                        th:value="${s.getReg_nom()}" class="mask-regnum">
+            </div>
+            <div class="afRow">Наименование:
+                <input class="name"
+                       th:name="stajgetName + ${s.getId_staj()}" type="text"
+                       th:value="${s.getName()}">
+                <input type="button" value="&#10004;" placeholder="Изменить"
+                       th:name="${s.getId_staj()}"
+                       th:id="stajupdatename">
+                <input type="button" value="&#10060;" placeholder="Удалить"
+                       th:name="${s.getId_staj()}"
+                       th:id="stajdelette">
+
+                <a th:id="x3+${s.getId_staj()}"
+                   th:href="'/kils/find_kart_graj/downloadxmlStaj?idpeople='+${people.getId_people()}+'&idst='+${s.getId_staj()}"
+                   hidden>xml2</a>
+                <input type="button" th:name="${s.getId_staj()}"
+                       th:class="${s.isKorZ()? 'downloadStaj' : 'downloadStaj hide'}" value="Скачать xml">
+
+            </div>
+        </div>
+
+        <table class="afSmallFontTable afWidth100">
+            <thead>
+            <tr class="afWordBreak">
+                <th rowspan="2" class="afCenter">
+                    <p class="afSmallSize">Начало периода с (дд.мм.гггг)</p>
+                </th>
+                <th rowspan="2" class="afCenter">
+                    <p class="afSmallSize">Конец периода по (дд.мм.гггг)</p>
+                </th>
+                <th rowspan="2" class="afCenter">
+                    <p class="afSmallSize">Сведения об увольнении ЗЛ</p>
+                </th>
+                <th rowspan="2" class="afCenter">
+                    <p class="afSmallSize">Территориальные условия (код)</p>
+                </th>
+                <th rowspan="2" class="afCenter">
+                    <p class="afSmallSize">Особые условия труда (код)</p>
+                </th>
+                <th colspan="2" class="afCenter">
+                    <p class="afSmallSize">Исчисление страхового стажа</p>
+                </th>
+                <th colspan="2" class="afCenter">
+                    <p class="afSmallSize">Условия для досрочного назначения страховой пенсии</p>
+                </th>
+                <th rowspan="2" class="afCenter">
+                    <p class="afSmallSize">Сведения о начислении (уплате) страховых взносов за указанный период</p>
+                </th>
+                <th rowspan="2" class="afCenter">
+                    <p class="afSmallSize">Код категории застрахованного лица</p>
+                </th>
+                <th rowspan="2" class="afCenter">
+                    <p class="afSmallSize">Дата снятия с учета (дд.мм.гг)</p>
+                </th>
+                <th rowspan="2" class="afCenter">
+                    <p class="afSmallSize">Действие</p>
+                </th>
+                <th colspan="2" class="afCenter">
+                    <p class="afSmallSize">Корр.</p>
+                </th>
+            </tr>
+            <tr>
+                <th class="afCenter">Основание (код)</th>
+                <th class="afCenter">Дополнительные сведения</th>
+                <th class="afCenter">Основание (код)</th>
+                <th class="afCenter">Дополнительные сведения</th>
+                <td class="afCenter">Р</td>
+                <td class="afCenter">З</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="st : ${s.getStaj_tables()}">
+                <td class="afValue afCenter" rowspan="1" th:text=${st.getPeriod_sD()}></td>
+                <td class="afValue afCenter" rowspan="1" th:text=${st.getPeriod_poD()}></td>
+                <td class="afValue afCenter" rowspan="1" th:text=${st.getUvol()}></td>
+
+                <td class="afValue afCenter" th:text="${st.getTer_usl_koeff()} == null ? ${st.getTer_uslNULL()} : ${st.getTer_uslNULL()} + ' , ' + ${st.getTer_usl_koeffNULL()}"></td>
+                <td class="afValue afCenter" th:text="${st.getPoz_spis()} == null ? ${st.getOsob_uslNULL()} : ${st.getOsob_uslNULL()} + ' , ' + ${st.getPoz_spisNULL()}"></td>
+
+                <td class="afValue afCenter" th:text=${st.getStrah_staj_osn()}></td>
+                <td class="afValue afCenter" th:text=${st.getStrah_staj_dop_sved()}></td>
+                <td class="afValue afCenter" th:text=${st.getDosr_naz_strah_pens_osn()}></td>
+                <td class="afValue afCenter" th:text=${st.getDosr_naz_strah_pens_dop_sved()}></td>
+                <td class="afValue afCenter" rowspan="1" th:text=${st.getStrah_vzn()}></td>
+                <td class="afValue afCenter" rowspan="1" th:text=${st.getKod_zastr_lica()}></td>
+                <td class="afValue afCenter" rowspan="1" th:text=${st.getDataSniatia()}></td>
+                <td class="afValue afCenter">
+                    <div style="display:flex">
+                        <input type="button" value="&#9998;" placeholder="Редактировать"
+                               th:name="${st.getId_staj_table()}"
+                               th:id="stajtableupdatemodalopen">
+                        <input type="button" value="&#10060;" placeholder="Удалить"
+                               th:name="${st.getId_staj_table()}"
+                               th:id="stajtabledelette">
+
+                    </div>
+                </td>
+
+                <td class="afValue afCenter">
+                    <label>
+                        <input type="checkbox" class="filled-in stajtablekorresh"
+                               th:name="${st.getId_staj_table()}" th:id="stajtablekorresh"
+                               th:checked="${st.getIsreshkor()==1}" />
+                        <span class="marginonospan"></span>
+                    </label>
+                </td>
+                <td class="afValue afCenter">
+                    <label>
+                        <input type="checkbox" class="filled-in stajtablekorrzap"
+                               th:name="${st.getId_staj_table()}" th:id="stajtablekorrzap"
+                               th:checked="${st.getIszapkor()==1}" />
+                        <span class="marginonospan"></span>
+                    </label>
+                </td>
+
+            </tr>
+            <tr>
+                <td colspan="15">
+                    <input type="button" value="+" placeholder="Добавить"
+                           th:name="${s.getId_staj()}"
+                           th:id="stajtableadd_popup">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <hr>
+    </div>
+</div>
+
+<!--<div th:fragment="sved_zar_do(sved_zar)" th:each="sz : ${sved_zar}">
+
+    <p class="afInterval"></p>
+    <p class="afP">Сведения о заработке (вознаграждении), доходе, учитываемые при назначении страховой пенсии:</p>
+    <p class="afInterval"></p>
+    <div class="afRow">
+        <div class="afC">Номер справки:</div>
+        <div class="afCol-1-6 afValue afUnderlinedBlock" th:text=${sz.getNom_sprav()}></div>
+        <div class="afC">Дата справки:</div>
+        <div class="afCol-1-6 afValue afUnderlinedBlock" th:text=${sz.getData_sprav()}></div>
+    </div>
+    <p class="afP">Заработок за период с
+        <span class="afValue afUnderline" th:text=${sz.getPeriod_s()}></span> по
+        <span class="afValue afUnderline" th:text=${sz.getPeriod_po()}></span>
+    </p>
+    <table>
+        <tr></tr>
+        <td class="afVerticalTop" th:each="szg : ${sz.getZarGods()}">
+            <table class="afColumn">
+                <tr>
+                    <td>Год <span class="afValue" th:text=${szg.getGod()}></span></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Сумма (руб.)</td>
+                    <td></td>
+                </tr>
+
+                <tr th:each="szm : ${szg.getSvedZarMounths()}">
+                    <td th:text=${szm.getMounthName()}></td>
+                    <td class="afTextAlignRight" th:text=${szm.getSum()}></td>
+                </tr>
+
+                <tr>
+                    <td>Итого</td>
+                    <td th:text=${szg.getItogo()}></td>
+                </tr>
+
+            </table>
+        </td>
+        <tr></tr>
+    </table>
+</div>-->
+
+</body>
+</html>

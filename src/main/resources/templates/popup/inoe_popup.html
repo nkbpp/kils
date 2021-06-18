@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<body>
+
+    <table th:fragment="inoe_popup_update(inoe)">
+        <tr>
+            <td> Наименование </td>
+            <td>
+                <input type="text" id="inoeNameupdate" th:value="${inoe.getName()}">
+            </td>
+        </tr>
+        <tr>
+            <td> Рег номер </td>
+            <td>
+                <input type="text" id="inoeReg_numupdate" th:value="${inoe.getReg_num()}" class="mask-regnum">
+            </td>
+        </tr>
+        <tr>
+            <td> Иные периоды </td>
+            <td>
+                <input type="text" id="inoeInoe_periodupdate" th:value="${inoe.getInoe_period()}">
+            </td>
+        </tr>
+        <tr>
+            <td> Начало периода </td>
+            <td>
+                <input type="date" id="inoePeriod_startupdate" th:value="${inoe.getPeriod_start()}">
+            </td>
+        </tr>
+        <tr>
+            <td> Конец периода </td>
+            <td>
+                <input type="date" id="inoePeriod_endupdate" th:value="${inoe.getPeriod_end()}">
+            </td>
+        </tr>
+        <tr>
+            <td> СНИЛС </td>
+            <td>
+                <input class="mask-snils" type="text" id="inoeSnilsupdate" th:value="${inoe.getSnils()}">
+            </td>
+        </tr>
+        <tr>
+            <td> Дата рождения </td>
+            <td>
+                <input type="date" id="inoeData_rojupdate" th:value="${inoe.getData_roj()}">
+            </td>
+        </tr>
+        <tr>
+            <td class="afValue afCenter">
+            <input type="button"  value="Изменить"
+                   th:name="${inoe.getId_inoe()}"
+                   th:id="inoetableupdatepopup"></td>
+        </tr>
+    </table>
+
+    <table th:fragment="inoe_popup_add">
+        <tr>
+            <td> Наименование </td>
+            <td>
+                <input type="text" id="inoeName">
+            </td>
+        </tr>
+        <tr>
+            <td> Рег номер </td>
+            <td>
+                <input type="text" id="inoeReg_num" class="mask-regnum">
+            </td>
+        </tr>
+        <tr>
+            <td> Иные периоды </td>
+            <td>
+                <input type="text" id="inoeInoe_period">
+            </td>
+        </tr>
+        <tr>
+            <td> Начало периода </td>
+            <td>
+                <input type="date" id="inoePeriod_start">
+            </td>
+        </tr>
+        <tr>
+            <td> Конец периода </td>
+            <td>
+                <input type="date" id="inoePeriod_end">
+            </td>
+        </tr>
+        <tr>
+            <td> СНИЛС </td>
+            <td>
+                <input class="mask-snils" type="text" id="inoeSnils">
+            </td>
+        </tr>
+        <tr>
+            <td> Дата рождения </td>
+            <td>
+                <input type="date" id="inoeData_roj">
+            </td>
+        </tr>
+        <tr>
+            <td class="afValue afCenter">
+                <input type="button"  value="Добавить"
+                       th:id="inoeadd">
+        </tr>
+    </table>
+
+</body>
+</html>

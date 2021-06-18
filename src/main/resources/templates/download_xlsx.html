@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+        <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>KILS</title>
+    <link type="text/css" rel="stylesheet" href="/webjars/materialize/1.0.0-rc.2/dist/css/materialize.min.css"/>
+    <script type="text/javascript" src="/webjars/jquery/3.3.1/jquery.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // обработка и отправка AJAX запроса при клике на кнопку upload_filesZ
+            var errtext = "";
+            var files;
+            $('input[type=file]').change(function(){
+                files = this.files;
+            });
+
+            $('body').on('click', 'a', function () {
+                if ($(this).attr('id') == "test") {
+                    var type = 'data:application/octet-stream;base64, ';
+                    var base = btoa(unescape(encodeURIComponent(errtext)));
+                    var res = type + base;
+                    document.getElementById('test').href = res;
+                }
+            });
+
+
+            $('#button').click(function( event ){
+                $('#zag').text("Идет загрузка!");
+                $('#button').addClass("adisabled");
+                $("#filedocz").prop('disabled', true);
+
+                var token = $('#_csrf').attr('content');
+                var header = $('#_csrf_header').attr('content');
+
+                event.stopPropagation(); // Остановка происходящего
+                event.preventDefault();  // Полная остановка происходящего
+                // Создадим данные формы и добавим в них данные файлов из files
+                if(files==undefined){alert("Файл не выбран!");return 0;}
+
+                var data = new FormData();
+                $.each( files, function( key, value ){
+                    data.append( key, value );
+                });
+
+                // Отправляем запрос
+                var form = $("#addDocumentzForm");
+                $.ajax({
+                    url: form.attr("action"),
+                    type: 'POST',
+                    data: data,
+                    cache: false,
+                    //dataType: 'json',
+                    dataType: 'text',
+                    processData: false, // Не обрабатываем файлы (Don't process the files)
+                    contentType: false, // Так jQuery скажет серверу что это строковой запрос
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader(header, token);
+                    },
+                    success: function( respond, textStatus, jqXHR ){
+                        //console.log(respond);
+                        $('#filedocz').val("");
+                        alert("Операция завершена!");
+                        $('#zag').text("");
+                        $('#button').removeClass("adisabled");
+                        $("#filedocz").prop('disabled', false);
+/*                        let isAdd = confirm("Операция завершена! Добавить еще?");
+                        if(!isAdd){document.location.replace("/kils/find_kart_graj");}*/
+                    },
+                    error: function( jqXHR, textStatus, errorThrown ){
+                        console.log('ОШИБКИ AJAX запроса: ' + textStatus );
+                    }
+                });
+
+            });
+
+
+        });
+    </script>
+
+    <link rel="stylesheet" th:href="@{/styles/full.css}"><!--мои локальные стили-->
+
+</head>
+<body>
+
+<div th:insert="fragment/logout :: logout(${user})"></div>
+<br>
+<div th:insert="menu/menu :: menu"></div>
+
+
+<div>Загрузить организации из файла .xlsx. Файл должен содержать один лист со списком организаций в порядке:
+    "Рег. номер ПФР",	"Сокращенное наименование/ФИО",	"ИНН",	"КПП". Первая строка - заголовки.
+</div>
+<br>
+<form method="POST"
+      th:action="@{/kils/download_xlsx/addxlsx}"
+      enctype="multipart/form-data"
+      id="addDocumentzForm" class="row">
+    <input name="filez"
+           id="filedocz"
+           type="file"
+           accept=".xlsx">
+    <!--multiple="multiple"-->
+    <div><a href="#" id='button'>Добавить</a></div>
+</form>
+<br>
+<div id="zag"></div></div>
+
+<!--<div><a a href="/kils/upfr_menu">Назад</a></div>-->
+<script type="text/javascript" src="/webjars/materialize/1.0.0-rc.2/dist/js/materialize.min.js"></script>
+</body>
+</html>

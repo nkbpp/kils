@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<body>
+
+<table th:fragment="sops_table_popup_update(sops_table)">
+    <tr>
+        <td> Начало периода</td>
+        <td>
+            <input type="date" id="sopstablePeriod_startupd" th:value="${sops_table.getPeriod_start()}">
+        </td>
+    </tr>
+    <tr>
+        <td> Конец периода</td>
+        <td>
+            <input type="date" id="sopstablePeriod_endupd" th:value="${sops_table.getPeriod_end()}">
+        </td>
+    </tr>
+    <tr>
+        <td> Территориальные условия3</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${terUsl},'sopstableTer_uslovijaupd','Территориальные условия')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Территориальные условия коэффициент</td>
+        <td>
+            <input type="text" id="sopstableTer_uslovijaupd_koef" th:value="${sops_table.getTer_uslovija_koef()}">
+        </td>
+    </tr>
+    <tr>
+        <td> Особые условия труда</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${osobUslTr},'sopstableOsob_uslovijaupd','Особые условия труда')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Позиция cписка</td>
+        <td>
+            <input type="text" id="poz_spis" th:value="${sops_table.getPoz_spis()}">
+        </td>
+    </tr>
+    <tr>
+        <td> Исчисляемый трудовой стаж осн.</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${ischisStaj},'sopstableTrud_staj_osnupd','Исч. трудовой стаж осн.')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Исчисление страхового стажа Доп. свед.</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${ischisStajDop},'sopstableTrud_staj_dopsvedupd','Исч. страхового стажа Доп. свед.')"></div>
+            <!--<input type="text" id="sopstableTrud_staj_dopsvedupd" th:value="${sops_table.getTrud_staj_dopsved()}">-->
+        </td>
+    </tr>
+    <tr>
+        <td> Выслуга лет Осн.</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${visLet},'sopstableVis_let_osnupd','Выслуга лет Осн.')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Выслуга лет Доп. свед.</td>
+        <td>
+            <input type="text" id="sopstableVis_let_dopsvedupd" th:value="${sops_table.getVis_let_dopsved()}">
+        </td>
+    </tr>
+    <tr>
+        <td class="afValue afCenter">
+            <input type="button" value="Изменить"
+                   th:name="${sops_table.getId_sops_do_table()}"
+                   th:id="sopstableupdatepopup"></td>
+    </tr>
+</table>
+
+<!--<table th:fragment="sops_do_table_popup_add(id)">
+    <tr>
+        <td> Начало периода</td>
+        <td>
+            <input type="date" id="sopstabledoPeriod_start">
+        </td>
+    </tr>
+    <tr>
+        <td> Конец периода</td>
+        <td>
+            <input type="date" id="sopstabledoPeriod_end">
+        </td>
+    </tr>
+    <tr>
+        <td> Территориальные условия</td>
+        <td>
+            <input type="text" id="sopstabledoTer_uslovija">
+        </td>
+    </tr>
+    <tr>
+        <td> Особые условия труда</td>
+        <td>
+            <input type="text" id="sopstabledoOsob_uslovija">
+        </td>
+    </tr>
+    <tr>
+        <td> Исчисляемый трудовой стаж осн.</td>
+        <td>
+            <input type="text" id="sopstabledoTrud_staj_osn">
+        </td>
+    </tr>
+    <tr>
+        <td> Исчисление страхового стажа Доп. свед.</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${ischisStajDop},'sopstabledoTrud_staj_dopsved','Исчисление страхового стажа Доп. свед.')"></div>
+            &lt;!&ndash;<input type="text" id="sopstabledoTrud_staj_dopsved">&ndash;&gt;
+        </td>
+    </tr>
+    <tr>
+        <td> Выслуга лет Осн.</td>
+        <td>
+            <input type="text" id="sopstabledoVis_let_osn">
+        </td>
+    </tr>
+    <tr>
+        <td> Выслуга лет Доп. свед.</td>
+        <td>
+            <input type="text" id="sopstabledoVis_let_dopsved">
+        </td>
+    </tr>
+    <tr>
+        <td class="afValue afCenter">
+            <input type="button" value="Добавить"
+                   th:name="${id}"
+                   th:id="sopstabledoadd">
+    </tr>
+</table>-->
+
+<table th:fragment="sops_posle_table_popup_add(id)">
+    <tr>
+        <td> Начало периода</td>
+        <td>
+            <input type="date" id="sopstableposlePeriod_start">
+        </td>
+    </tr>
+    <tr>
+        <td> Конец периода</td>
+        <td>
+            <input type="date" id="sopstableposlePeriod_end">
+        </td>
+    </tr>
+    <tr>
+        <td> Территориальные условия</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${terUsl},'sopstableposleTer_uslovija','Территориальные условия')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Территориальные условия коэффициент</td>
+        <td>
+            <input type="text" id="sopstableposleTer_uslovija_koef">
+        </td>
+    </tr>
+    <tr>
+        <td> Особые условия труда</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${osobUslTr},'sopstableposleOsob_uslovija','Особые условия труда')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Позиция списка</td>
+        <td>
+            <input type="text" id="poz_spis">
+        </td>
+    </tr>
+    <tr>
+        <td> Исчисляемый трудовой стаж осн.</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${ischisStaj},'sopstableposleTrud_staj_osn','Исч. трудовой стаж осн.')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Исчисление страхового стажа Доп. свед.</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${ischisStajDop},'sopstableposleTrud_staj_dopsved','Исч. страхового стажа Доп. свед.')"></div>
+            <!--<input type="text" id="sopstableposleTrud_staj_dopsved">-->
+        </td>
+    </tr>
+    <tr>
+        <td> Выслуга лет Осн.</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${visLet},'sopstableposleVis_let_osn','Выслуга лет Осн.')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Выслуга лет Доп. свед.</td>
+        <td>
+            <input type="text" id="sopstableposleVis_let_dopsved">
+        </td>
+    </tr>
+    <tr>
+        <td class="afValue afCenter">
+            <input type="button" value="Добавить"
+                   th:name="${id}"
+                   th:id="sopstableposleadd">
+    </tr>
+</table>
+
+<table th:fragment="sops_doljnost_popup_update(sops_do_doljnost)">
+    <tr>
+        <td> Начало периода</td>
+        <td>
+            <input type="date" id="sopstablePeriod_startupd"
+                   th:value="${sops_do_doljnost.getSops_tables().get(0).getPeriod_start()}">
+        </td>
+    </tr>
+    <tr>
+        <td> Конец периода</td>
+        <td>
+            <input type="date" id="sopstablePeriod_endupd"
+                   th:value="${sops_do_doljnost.getSops_tables().get(0).getPeriod_end()}">
+        </td>
+    </tr>
+    <tr>
+        <td> Территориальные условия</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${terUsl},'sopstableTer_uslovijaupd','Территориальные условия')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Территориальные условия коэффициент</td>
+        <td>
+            <input type="text" id="sopstableTer_uslovijaupd_koef"
+                   th:value="${sops_do_doljnost.getSops_tables().get(0).getTer_uslovija_koef()}">
+        </td>
+    </tr>
+    <tr>
+        <td> Особые условия труда</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${osobUslTr},'sopstableOsob_uslovijaupd','Особые условия труда')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Позиция cписка</td>
+        <td>
+            <input type="text" id="poz_spis" th:value="${sops_do_doljnost.getSops_tables().get(0).getPoz_spis()}">
+        </td>
+    </tr>
+    <tr>
+        <td> Исчисляемый трудовой стаж осн.</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${ischisStaj},'sopstableTrud_staj_osnupd','Исч. трудовой стаж осн.')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Исчисление страхового стажа Доп. свед.</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${ischisStajDop},'sopstableTrud_staj_dopsvedupd','Исч. страхового стажа Доп. свед.')"></div>
+<!--            <input type="text" id="sopstableTrud_staj_dopsvedupd"
+                   th:value="${sops_do_doljnost.getSops_tables().get(0).getTrud_staj_dopsved()}">-->
+        </td>
+    </tr>
+    <tr>
+        <td> Выслуга лет Осн.</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${visLet},'sopstableVis_let_osnupd','Выслуга лет Осн.')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Выслуга лет Доп. свед.</td>
+        <td>
+            <input type="text" id="sopstableVis_let_dopsvedupd"
+                   th:value="${sops_do_doljnost.getSops_tables().get(0).getVis_let_dopsved()}">
+        </td>
+    </tr>
+    <tr>
+        <td> Должность</td>
+        <td>
+            <input type="text" id="sopsdoljnostupd" th:value="${sops_do_doljnost.getDoljnost()}">
+        </td>
+    </tr>
+    <tr>
+        <td class="afValue afCenter">
+            <input type="button" value="Изменить"
+                   th:name="${sops_do_doljnost.getId_sops_do_doljnost()}"
+                   th:id="sopsdoljnostupdatepopup"></td>
+    </tr>
+</table>
+
+<table th:fragment="sopsdoljnostadd(id)">
+    <tr>
+        <td> Начало периода</td>
+        <td>
+            <input type="date" id="sopstabledoPeriod_start">
+        </td>
+    </tr>
+    <tr>
+        <td> Конец периода</td>
+        <td>
+            <input type="date" id="sopstabledoPeriod_end">
+        </td>
+    </tr>
+    <tr>
+        <td> Территориальные условия</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${terUsl},'sopstabledoTer_uslovija','Территориальные условия')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Территориальные условия коэффициент</td>
+        <td>
+            <input type="text" id="sopstabledoTer_uslovija_koef">
+        </td>
+    </tr>
+    <tr>
+        <td> Особые условия труда</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${osobUslTr},'sopstabledoOsob_uslovija','Особые условия труда')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Позиция cписка</td>
+        <td>
+            <input type="text" id="poz_spis">
+        </td>
+    </tr>
+    <tr>
+        <td> Исчисляемый трудовой стаж осн.</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${ischisStaj},'sopstabledoTrud_staj_osn','Исч. трудовой стаж осн.')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Исчисление страхового стажа Доп. свед.</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${ischisStajDop},
+                    'sopstabledoTrud_staj_dopsved',
+                    'Исч. страхового стажа Доп. свед.')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Выслуга лет Осн.</td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${visLet},'sopstabledoVis_let_osn','Выслуга лет Осн.')"></div>
+        </td>
+    </tr>
+    <tr>
+        <td> Выслуга лет Доп. свед.</td>
+        <td>
+            <input type="text" id="sopstabledoVis_let_dopsved">
+        </td>
+    </tr>
+    <tr>
+        <td> Должность</td>
+        <td>
+            <input type="text" id="sdoljnostadd">
+        </td>
+    </tr>
+    <tr>
+        <td class="afValue afCenter">
+            <input type="button" value="Добавить"
+                   th:name="${id}"
+                   th:id="sopsdoljnostadd">
+    </tr>
+</table>
+
+
+
+
+<table th:fragment="addSvedZarGodFromFile_popup(id)">
+    <tr>
+        <td class="afValue afCenter">
+            <form method="POST"
+                  th:action="@{/kart_graj/addSvedZarGodFromFile}"
+                  enctype="multipart/form-data"
+                  id="addDocumentzForm" class="row">
+                <table>
+                    <tr>
+                        <td>
+                            <input type="file"
+                                   accept=".docx"
+                                   th:id="filedocx">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="button" th:name="${id}" id='addSvedZarGodFromFile' value="Добавить">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

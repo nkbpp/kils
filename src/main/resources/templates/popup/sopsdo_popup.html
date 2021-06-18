@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<body>
+
+<table th:fragment="addsopsdo_popup(id)">
+    <tr>
+        <td> Наименование организации </td>
+        <td>
+            <input type="text" id="addsopsdoname_org">
+        </td>
+    </tr>
+    <tr>
+        <td> Вид деятельности (код) </td>
+        <td>
+            <div th:replace="popup/spiski :: spiski(${ischisStajDop},
+            'addsopsdovid_d','Вид деятельности (код)')"></div>
+
+            <!--<input type="text" id="addsopsdovid_d">-->
+        </td>
+    </tr>
+    <tr>
+        <td class="afValue afCenter">
+            <input type="button"  value="Добавить"
+                   th:name="${id}"
+                   th:id="addsopsdo"></td>
+    </tr>
+</table>
+
+</body>
+</html>
